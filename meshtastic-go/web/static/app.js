@@ -18,7 +18,7 @@ let channelMessages = {}; // Messages keyed by channel index
 let myNode = null; // Local node info
 let nodeSearchQuery = '';
 let nodeSortBy = 'lastHeard';
-let nodeFilterBy = 'all';
+let nodeFilters = new Set(); // Multiple filters can be active
 
 // DOM Elements
 const statusDot = document.getElementById('statusDot');
@@ -51,7 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function initNodeControls() {
     const searchInput = document.getElementById('nodeSearch');
     const sortSelect = document.getElementById('nodeSort');
-    const filterSelect = document.getElementById('nodeFilter');
+    const filterToggleBtn = document.getElementById('filterToggleBtn');
+    const filterPanel = document.getElementById('nodeFilterPanel');
+    const filterBadge = document.getElementById('filterBadge');
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -67,11 +69,52 @@ function initNodeControls() {
         });
     }
 
-    if (filterSelect) {
-        filterSelect.addEventListener('change', (e) => {
-            nodeFilterBy = e.target.value;
+    // Filter panel toggle
+    if (filterToggleBtn && filterPanel) {
+        filterToggleBtn.addEventListener('click', () => {
+            filterPanel.classList.toggle('open');
+        });
+    }
+
+    // Filter chip checkboxes
+    const filterChips = document.querySelectorAll('.filter-chip');
+    filterChips.forEach(chip => {
+        const checkbox = chip.querySelector('input[type="checkbox"]');
+        const filterType = chip.dataset.filter;
+
+        chip.addEventListener('click', (e) => {
+            e.preventDefault();
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                nodeFilters.add(filterType);
+                chip.classList.add('active');
+            } else {
+                nodeFilters.delete(filterType);
+                chip.classList.remove('active');
+            }
+
+            updateFilterBadge();
             renderNodeList();
         });
+    });
+}
+
+// Update filter badge count
+function updateFilterBadge() {
+    const filterBadge = document.getElementById('filterBadge');
+    const filterToggleBtn = document.getElementById('filterToggleBtn');
+    const count = nodeFilters.size;
+
+    if (filterBadge) {
+        if (count > 0) {
+            filterBadge.textContent = count;
+            filterBadge.style.display = 'flex';
+            filterToggleBtn?.classList.add('has-filters');
+        } else {
+            filterBadge.style.display = 'none';
+            filterToggleBtn?.classList.remove('has-filters');
+        }
     }
 }
 
@@ -720,30 +763,37 @@ function renderNodeList() {
         });
     }
 
-    // Apply category filter
+    // Apply checkbox filters (AND logic - node must match ALL active filters)
     const now = Date.now() / 1000;
-    switch (nodeFilterBy) {
-        case 'online':
-            nodeArray = nodeArray.filter(n => n.lastHeard && (now - n.lastHeard) < 3600);
-            break;
-        case 'recent':
-            nodeArray = nodeArray.filter(n => n.lastHeard && (now - n.lastHeard) < 300);
-            break;
-        case 'favorites':
-            nodeArray = nodeArray.filter(n => n.isFavorite);
-            break;
-        case 'hasPosition':
-            nodeArray = nodeArray.filter(n => n.latitude && n.longitude);
-            break;
-        case 'direct':
-            nodeArray = nodeArray.filter(n => n.hopsAway === 0);
-            break;
-        case 'mqtt':
-            nodeArray = nodeArray.filter(n => n.viaMqtt);
-            break;
-        case 'hasBattery':
-            nodeArray = nodeArray.filter(n => n.batteryLevel && n.batteryLevel > 0 && n.batteryLevel <= 100);
-            break;
+    if (nodeFilters.size > 0) {
+        nodeArray = nodeArray.filter(n => {
+            for (const filter of nodeFilters) {
+                switch (filter) {
+                    case 'online':
+                        if (!(n.lastHeard && (now - n.lastHeard) < 3600)) return false;
+                        break;
+                    case 'recent':
+                        if (!(n.lastHeard && (now - n.lastHeard) < 300)) return false;
+                        break;
+                    case 'favorites':
+                        if (!n.isFavorite) return false;
+                        break;
+                    case 'hasPosition':
+                        if (!(n.latitude && n.longitude)) return false;
+                        break;
+                    case 'direct':
+                        if (n.hopsAway !== 0) return false;
+                        break;
+                    case 'mqtt':
+                        if (!n.viaMqtt) return false;
+                        break;
+                    case 'hasBattery':
+                        if (!(n.batteryLevel && n.batteryLevel > 0 && n.batteryLevel <= 100)) return false;
+                        break;
+                }
+            }
+            return true;
+        });
     }
 
     // Apply sort
