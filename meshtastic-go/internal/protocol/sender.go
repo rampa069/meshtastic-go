@@ -772,6 +772,40 @@ func (s *Sender) SendWaypoint(waypoint *pb.Waypoint, channel uint32) (uint32, er
 	return packetId, nil
 }
 
+// SendReboot sends a reboot command to the local device
+func (s *Sender) SendReboot(seconds int32) (uint32, error) {
+	adminMsg := &pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_RebootSeconds{RebootSeconds: seconds},
+	}
+
+	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	if err != nil {
+		return 0, fmt.Errorf("failed to marshal reboot admin message: %w", err)
+	}
+
+	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
+	log.Info().Int32("seconds", seconds).Msg("sending reboot command")
+
+	return s.SendAdminMessage(myNodeNum, adminData)
+}
+
+// SendShutdown sends a shutdown command to the local device
+func (s *Sender) SendShutdown(seconds int32) (uint32, error) {
+	adminMsg := &pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_ShutdownSeconds{ShutdownSeconds: seconds},
+	}
+
+	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	if err != nil {
+		return 0, fmt.Errorf("failed to marshal shutdown admin message: %w", err)
+	}
+
+	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
+	log.Info().Int32("seconds", seconds).Msg("sending shutdown command")
+
+	return s.SendAdminMessage(myNodeNum, adminData)
+}
+
 // sendFramed sends data to the radio
 // Note: The actual framing is done by the transport layer (HandleSendToRadio)
 func (s *Sender) sendFramed(data []byte) error {

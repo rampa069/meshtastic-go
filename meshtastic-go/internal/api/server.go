@@ -1135,19 +1135,33 @@ func (s *Server) handleRequestNeighborInfo(c *gin.Context) {
 
 // Device action handlers
 func (s *Server) handleReboot(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	// Reboot after 2 seconds to allow response to be sent
+	packetId, err := s.meshService.Reboot(2)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
 func (s *Server) handleShutdown(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	// Shutdown after 2 seconds to allow response to be sent
+	packetId, err := s.meshService.Shutdown(2)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
 func (s *Server) handleFactoryReset(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	// TODO: Implement factory reset
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
 func (s *Server) handleNodeDBReset(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	// TODO: Implement node DB reset
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
 }
 
 // Quick chat handlers

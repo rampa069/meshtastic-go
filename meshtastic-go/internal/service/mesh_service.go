@@ -450,6 +450,22 @@ func (ms *MeshService) SetModuleConfig(moduleConfig *pb.ModuleConfig) (uint32, e
 	return ms.sender.SetModuleConfig(moduleConfig)
 }
 
+// Reboot sends a reboot command to the device
+func (ms *MeshService) Reboot(seconds int32) (uint32, error) {
+	if ms.sender == nil {
+		return 0, fmt.Errorf("not connected")
+	}
+	return ms.sender.SendReboot(seconds)
+}
+
+// Shutdown sends a shutdown command to the device
+func (ms *MeshService) Shutdown(seconds int32) (uint32, error) {
+	if ms.sender == nil {
+		return 0, fmt.Errorf("not connected")
+	}
+	return ms.sender.SendShutdown(seconds)
+}
+
 // NodeManager returns the node manager
 func (ms *MeshService) NodeManager() *NodeManager {
 	return ms.nodeManager
