@@ -15,6 +15,7 @@ let leafletMap = null;
 let mapMarkers = {};
 let selectedChannel = null;
 let channelMessages = {}; // Messages keyed by channel index
+let channelUnreadCounts = {}; // Unread message counts per channel
 let myNode = null; // Local node info
 let nodeSearchQuery = '';
 let nodeSortBy = 'lastHeard';
@@ -1141,22 +1142,48 @@ async function loadMessages(nodeNum) {
 }
 
 function addMessage(message) {
-    if (!message || !message.contactKey) return;
+    if (!message) return;
 
-    if (!messages[message.contactKey]) {
-        messages[message.contactKey] = [];
+    // Handle channel messages (broadcast/channel)
+    const channelIdx = message.channel;
+    if (channelIdx !== undefined && channelIdx >= 0) {
+        if (!channelMessages[channelIdx]) {
+            channelMessages[channelIdx] = [];
+        }
+
+        // Check if message already exists (by packetId)
+        const existsInChannel = channelMessages[channelIdx].some(m => m.packetId === message.packetId);
+        if (!existsInChannel) {
+            channelMessages[channelIdx].push(message);
+
+            // Update unread count if not viewing this channel
+            if (!selectedChannel || selectedChannel.index !== channelIdx) {
+                channelUnreadCounts[channelIdx] = (channelUnreadCounts[channelIdx] || 0) + 1;
+                renderChannels();
+            } else {
+                // Re-render messages if viewing this channel
+                renderMessages();
+            }
+        }
     }
 
-    // Check if message already exists (by packetId)
-    const exists = messages[message.contactKey].some(m => m.packetId === message.packetId);
-    if (!exists) {
-        messages[message.contactKey].push(message);
-    }
+    // Handle DM messages (with contactKey)
+    if (message.contactKey) {
+        if (!messages[message.contactKey]) {
+            messages[message.contactKey] = [];
+        }
 
-    if (selectedNode) {
-        const contactKey = `!${(selectedNode.num >>> 0).toString(16)}`;
-        if (message.contactKey === contactKey) {
-            renderMessages();
+        // Check if message already exists (by packetId)
+        const exists = messages[message.contactKey].some(m => m.packetId === message.packetId);
+        if (!exists) {
+            messages[message.contactKey].push(message);
+        }
+
+        if (selectedNode) {
+            const contactKey = `!${(selectedNode.num >>> 0).toString(16)}`;
+            if (message.contactKey === contactKey) {
+                renderMessages();
+            }
         }
     }
 }
@@ -1255,7 +1282,9 @@ function renderMessages() {
             return;
         }
 
-        messagesList.innerHTML = msgList.map(msg => renderMessageBubble(msg, true)).join('');
+        // Sort messages chronologically (oldest first)
+        const sortedList = [...msgList].sort((a, b) => (a.time || 0) - (b.time || 0));
+        messagesList.innerHTML = sortedList.map(msg => renderMessageBubble(msg, true)).join('');
         messagesList.scrollTop = messagesList.scrollHeight;
         setupMessageInteractions();
         return;
@@ -1284,7 +1313,9 @@ function renderMessages() {
         </div>
     ` : '';
 
-    messagesList.innerHTML = loadMoreHtml + msgList.map(msg => renderMessageBubble(msg, false)).join('');
+    // Sort messages chronologically (oldest first)
+    const sortedList = [...msgList].sort((a, b) => (a.time || 0) - (b.time || 0));
+    messagesList.innerHTML = loadMoreHtml + sortedList.map(msg => renderMessageBubble(msg, false)).join('');
     messagesList.scrollTop = messagesList.scrollHeight;
     setupMessageInteractions();
     setupInfiniteScroll();
@@ -1294,11 +1325,20 @@ function renderMessageBubble(msg, isChannel) {
     const isMe = myNode && (msg.from === myNode.num || msg.from === 0);
     let senderName = 'Remote';
 
+    // Helper function to format node name nicely
+    const formatNodeName = (node, nodeNum) => {
+        if (!node) return `!${(nodeNum >>> 0).toString(16)}`;
+        if (node.shortName && node.longName && node.shortName !== node.longName) {
+            return `${node.shortName} (${node.longName})`;
+        }
+        return node.longName || node.shortName || `!${(nodeNum >>> 0).toString(16)}`;
+    };
+
     if (isChannel) {
         const senderNode = nodes[msg.from];
-        senderName = senderNode ? (senderNode.shortName || senderNode.longName || `!${(msg.from >>> 0).toString(16)}`) : `!${(msg.from >>> 0).toString(16)}`;
+        senderName = formatNodeName(senderNode, msg.from);
     } else if (selectedNode) {
-        senderName = selectedNode.shortName || selectedNode.longName || 'Remote';
+        senderName = formatNodeName(selectedNode, selectedNode.num);
     }
 
     const statusHtml = isMe && msg.status ? `
@@ -1675,6 +1715,16 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Copy text to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied', 'Text copied to clipboard', 'success');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        showToast('Error', 'Failed to copy to clipboard', 'error');
+    });
+}
+
 // Signal icon based on quality
 function getSignalIcon(quality) {
     const colors = { good: '#30C047', ok: '#FFD54F', weak: '#FF8800', poor: '#F44336' };
@@ -1803,9 +1853,10 @@ function renderChannels() {
         const isSelected = selectedChannel !== null && selectedChannel.index === ch.index;
         const isActive = ch.role !== 'DISABLED';
         const channelName = ch.name || (ch.role === 'PRIMARY' ? 'Primary' : `Channel ${ch.index}`);
+        const unreadCount = channelUnreadCounts[ch.index] || 0;
 
         return `
-        <div class="channel-card ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''}"
+        <div class="channel-card ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${unreadCount > 0 ? 'has-unread' : ''}"
              data-index="${ch.index}"
              data-role="${ch.role}"
              data-name="${channelName}"
@@ -1815,6 +1866,7 @@ function renderChannels() {
                 <div class="channel-name">${channelName}</div>
                 <div class="channel-role">${ch.role}</div>
             </div>
+            ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount > 99 ? '99+' : unreadCount}</span>` : ''}
             <div class="channel-actions">
                 ${isActive ? '<button class="channel-btn chat-btn" title="Chat"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg></button>' : ''}
                 <button class="channel-btn edit-btn" title="Edit channel"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>
@@ -1866,6 +1918,12 @@ function selectChannel(channel) {
     console.log('selectChannel called:', channel);
     selectedChannel = channel;
     selectedNode = null; // Deselect node when selecting channel
+
+    // Clear unread count for this channel
+    if (channelUnreadCounts[channel.index]) {
+        channelUnreadCounts[channel.index] = 0;
+        renderChannels();
+    }
 
     // Update channel list UI
     document.querySelectorAll('.channel-card').forEach(card => {
@@ -2185,7 +2243,20 @@ function renderConfig() {
                 </div>
                 ${configItem('Node ID', myNode ? '!' + (myNode.num >>> 0).toString(16) : 'Unknown')}
                 ${configItem('Licensed', myNode?.isLicensed, 'bool')}
-                ${myNode?.publicKey ? configItem('Public Key', myNode.publicKey.substring(0, 16) + '...') : ''}
+                ${myNode?.publicKey ? `
+                <div class="config-item">
+                    <span class="config-item-label">Public Key</span>
+                    <div class="config-item-copyable">
+                        <input type="text" class="config-item-input" value="${myNode.publicKey}" readonly
+                               onclick="this.select()" title="Click to select, then copy">
+                        <button class="btn-icon" onclick="copyToClipboard('${myNode.publicKey}')" title="Copy to clipboard">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                ` : ''}
             </div>
             <div class="config-actions" id="userActions" style="display: none;">
                 <button class="btn btn-primary btn-sm" onclick="saveUserConfig()">Save User Config</button>

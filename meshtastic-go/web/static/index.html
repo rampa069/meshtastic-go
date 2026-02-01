@@ -2180,6 +2180,26 @@
             background: var(--primary-container);
         }
 
+        .channel-card.has-unread {
+            font-weight: 500;
+        }
+
+        .channel-card.has-unread .channel-name {
+            font-weight: 600;
+        }
+
+        .unread-badge {
+            background: var(--primary);
+            color: var(--on-primary);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
         .channel-action {
             color: var(--on-surface-variant);
             display: flex;
@@ -2722,6 +2742,47 @@
         .config-item-select:focus {
             outline: none;
             border-color: var(--primary);
+        }
+
+        .config-item-copyable {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 100%;
+        }
+
+        .config-item-copyable .config-item-input {
+            flex: 1;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            min-width: 0;
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: 1px solid var(--outline-variant);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--primary);
+            color: var(--on-primary);
+            border-color: var(--primary);
+        }
+
+        .btn-icon:active {
+            transform: scale(0.95);
         }
 
         /* Toggle Switch */
