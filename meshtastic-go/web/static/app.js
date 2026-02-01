@@ -1145,9 +1145,14 @@ async function loadMessages(nodeNum) {
 function addMessage(message) {
     if (!message) return;
 
-    // Handle channel messages (broadcast/channel)
-    const channelIdx = message.channel;
-    if (channelIdx !== undefined && channelIdx >= 0) {
+    // Determine if this is a broadcast (channel message) or DM
+    // Broadcast address is 0xFFFFFFFF (4294967295 unsigned, or -1 signed)
+    const toUnsigned = message.to >>> 0;
+    const isBroadcast = toUnsigned === 0xFFFFFFFF;
+
+    // Handle channel messages (broadcast only)
+    if (isBroadcast) {
+        const channelIdx = message.channel || 0;
         if (!channelMessages[channelIdx]) {
             channelMessages[channelIdx] = [];
         }
@@ -1166,9 +1171,10 @@ function addMessage(message) {
                 renderMessages();
             }
         }
+        return; // Don't process as DM
     }
 
-    // Handle DM messages (with contactKey)
+    // Handle DM messages (non-broadcast, with contactKey)
     if (message.contactKey) {
         if (!messages[message.contactKey]) {
             messages[message.contactKey] = [];
@@ -1675,7 +1681,8 @@ async function sendMessage() {
             renderMessages();
         } else if (selectedNode) {
             // Send to specific node (DM)
-            const to = selectedNode.num;
+            // Use >>> 0 to ensure unsigned value for node number
+            const to = selectedNode.num >>> 0;
             const payload = {
                 to: to,
                 channel: 0,
