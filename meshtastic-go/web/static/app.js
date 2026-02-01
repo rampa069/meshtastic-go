@@ -261,6 +261,10 @@ function handleWebSocketMessage(data) {
                 renderConfig();
             }
             break;
+        case 'moduleConfig.updated':
+            // Refresh module cards when a module config is received
+            loadModuleStates();
+            break;
         case 'mynode.updated':
             if (data.data.node) {
                 myNode = data.data.node;
@@ -1979,13 +1983,54 @@ async function saveChannel(index) {
 }
 
 // Config
+let moduleStates = {};
+
 async function loadConfig() {
     try {
         const data = await api('GET', '/config');
         deviceConfig = data.config || {};
         renderConfig();
+        // Also load module states to update module cards
+        loadModuleStates();
     } catch (e) {
         console.error('Failed to load config:', e);
+    }
+}
+
+// Load module states and update cards
+async function loadModuleStates() {
+    try {
+        const data = await api('GET', '/modules');
+        moduleStates = data;
+        updateModuleCards();
+    } catch (e) {
+        console.error('Failed to load module states:', e);
+    }
+}
+
+// Update module card UI with actual enabled states
+function updateModuleCards() {
+    const moduleMapping = {
+        'mqtt': moduleStates.mqtt,
+        'serial': moduleStates.serial,
+        'storeforward': moduleStates.storeForward,
+        'telemetry': moduleStates.telemetry,
+        'rangetest': moduleStates.rangeTest,
+        'cannedmsg': moduleStates.cannedMessage,
+        'extnotify': moduleStates.externalNotification,
+        'neighborinfo': moduleStates.neighborInfo
+    };
+
+    for (const [id, config] of Object.entries(moduleMapping)) {
+        const card = document.querySelector(`.module-card[onclick*="'${id}'"]`);
+        if (card) {
+            const isEnabled = config?.enabled || false;
+            card.classList.toggle('enabled', isEnabled);
+            const statusEl = card.querySelector('.module-status');
+            if (statusEl) {
+                statusEl.textContent = isEnabled ? 'Enabled' : 'Disabled';
+            }
+        }
     }
 }
 
