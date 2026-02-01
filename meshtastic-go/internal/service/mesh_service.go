@@ -87,6 +87,19 @@ func (ms *MeshService) setupProcessorHandlers() {
 					"node": node,
 				},
 			})
+
+			// If this is our own node, also broadcast mynode.updated
+			ms.mu.RLock()
+			isMyNode := ms.myNodeNum != 0 && nodeInfo.Num == ms.myNodeNum
+			ms.mu.RUnlock()
+			if isMyNode {
+				ms.wsHub.Broadcast(websocket.Event{
+					Type: "mynode.updated",
+					Data: map[string]interface{}{
+						"node": node,
+					},
+				})
+			}
 		}
 	})
 

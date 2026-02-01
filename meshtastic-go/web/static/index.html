@@ -1526,9 +1526,18 @@
             width: 100%;
         }
 
+        /* Reset Leaflet divIcon defaults */
+        .leaflet-div-icon {
+            background: transparent;
+            border: none;
+        }
+
         /* Map Markers */
         .map-marker-container {
-            position: relative;
+            /* Container sized by Leaflet iconSize - content must be centered */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .map-marker-node {
@@ -1544,6 +1553,9 @@
             border: 3px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: transform 0.2s;
+            /* Ensure no extra margins */
+            margin: 0;
+            padding: 0;
         }
 
         .map-marker-node:hover {
@@ -1586,19 +1598,17 @@
 
         .map-marker-pulse {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 36px;
-            height: 36px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: rgba(48, 106, 66, 0.3);
             animation: map-pulse 2s ease-out infinite;
+            pointer-events: none;
         }
 
         @keyframes map-pulse {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
 
         /* Map Popup */
@@ -1764,16 +1774,37 @@
         .waypoint-panel-header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 0.5rem;
             padding: 0.75rem;
             border-bottom: 1px solid var(--border);
-            cursor: pointer;
         }
 
         .waypoint-panel-header h3 {
             margin: 0;
             font-size: 0.875rem;
             font-weight: 600;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .waypoint-panel-btn {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            color: var(--on-surface-variant);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waypoint-panel-btn:hover {
+            background: var(--surface-variant);
+        }
+
+        .waypoint-panel.hidden {
+            display: none;
         }
 
         .waypoint-panel-content {
@@ -3668,12 +3699,19 @@
                         <div id="leafletMap"></div>
 
                         <!-- Waypoint Panel -->
-                        <div class="waypoint-panel" id="waypointPanel">
-                            <div class="waypoint-panel-header" onclick="toggleWaypointPanel()">
-                                <h3>Waypoints</h3>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                                </svg>
+                        <div class="waypoint-panel collapsed" id="waypointPanel">
+                            <div class="waypoint-panel-header">
+                                <h3 onclick="toggleWaypointPanel()">📍 Waypoints</h3>
+                                <button class="waypoint-panel-btn" onclick="toggleWaypointPanel()" title="Expand/Collapse">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="waypointToggleIcon">
+                                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                                    </svg>
+                                </button>
+                                <button class="waypoint-panel-btn" onclick="hideWaypointPanel()" title="Close">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                    </svg>
+                                </button>
                             </div>
                             <div class="waypoint-panel-content">
                                 <div id="waypointList" class="waypoint-list">

@@ -261,6 +261,12 @@ function handleWebSocketMessage(data) {
                 renderConfig();
             }
             break;
+        case 'mynode.updated':
+            if (data.data.node) {
+                myNode = data.data.node;
+                showMyNode(myNode);
+            }
+            break;
         case 'metadata.updated':
             if (data.data.metadata) {
                 Object.assign(deviceConfig, data.data.metadata);
@@ -299,6 +305,9 @@ function handleWebSocketMessage(data) {
             break;
         case 'neighborinfo.updated':
             handleNeighborInfoUpdated(data.data);
+            break;
+        case 'position.updated':
+            handlePositionUpdated(data.data);
             break;
         case 'waypoint.received':
         case 'waypoint.created':
@@ -3477,6 +3486,7 @@ function addMapControls() {
             <button class="map-control-btn ${mapShowOffline ? 'active' : ''}" id="mapToggleOffline" title="Show offline nodes">◐</button>
             <button class="map-control-btn" id="mapCenterMyNode" title="Center on my node">⌖</button>
             <button class="map-control-btn" id="mapFitAll" title="Fit all nodes">□</button>
+            <button class="map-control-btn" id="mapToggleWaypoints" title="Show/hide waypoints">📍</button>
         `;
 
         // Prevent map interactions when clicking controls
@@ -3519,6 +3529,17 @@ function addMapControls() {
             if (nodesWithPosition.length > 0) {
                 const bounds = L.latLngBounds(nodesWithPosition.map(n => [n.latitude, n.longitude]));
                 leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            }
+        });
+
+        document.getElementById('mapToggleWaypoints')?.addEventListener('click', () => {
+            const panel = document.getElementById('waypointPanel');
+            if (panel) {
+                if (panel.classList.contains('hidden')) {
+                    showWaypointPanel();
+                } else {
+                    panel.classList.toggle('collapsed');
+                }
             }
         });
     }, 100);
@@ -3576,6 +3597,9 @@ function updateMapMarker(node) {
         return;
     }
 
+    // Debug: log coordinates to verify they're correct
+    console.debug(`Map marker ${node.shortName || node.num}: lat=${node.latitude}, lon=${node.longitude}`);
+
     const now = Date.now() / 1000;
     const shortName = node.shortName || '??';
     const isOnline = node.lastHeard && (now - node.lastHeard) < 3600;
@@ -3596,14 +3620,16 @@ function updateMapMarker(node) {
         markerClass += ' favorite';
     }
 
-    // Create custom icon
-    const iconSize = isMyNode ? 48 : 42;
+    // Create custom icon - sizes must match CSS (.map-marker-node: 36px, .map-marker-node.me: 42px)
+    const iconSize = isMyNode ? 42 : 36;
     const icon = L.divIcon({
         className: 'map-marker-container',
-        html: `
-            ${isMyNode ? '<div class="map-marker-pulse"></div>' : ''}
-            <div class="${markerClass}">${shortName.substring(0, 4).toUpperCase()}</div>
-        `,
+        html: isMyNode
+            ? `<div style="position:relative;width:${iconSize}px;height:${iconSize}px;display:flex;align-items:center;justify-content:center;">
+                 <div class="map-marker-pulse"></div>
+                 <div class="${markerClass}">${shortName.substring(0, 4).toUpperCase()}</div>
+               </div>`
+            : `<div class="${markerClass}">${shortName.substring(0, 4).toUpperCase()}</div>`,
         iconSize: [iconSize, iconSize],
         iconAnchor: [iconSize/2, iconSize/2]
     });
@@ -4000,20 +4026,24 @@ function closeTracerouteModal() {
 
 // Show traceroute on map
 function showTracerouteOnMap() {
-    if (!lastTracerouteData || !leafletMap) {
-        showToast('No traceroute data or map not available', 'error');
+    if (!lastTracerouteData) {
+        showToast('No traceroute data available', 'error');
         return;
     }
 
     closeTracerouteModal();
 
-    // Switch to map tab
+    // Switch to map tab (this will call initMap if needed)
     selectMobileTab('map');
 
-    // Small delay to ensure map is visible
+    // Delay to ensure map is initialized and visible
     setTimeout(() => {
+        if (!leafletMap) {
+            showToast('Map not available', 'error');
+            return;
+        }
         drawTracerouteOnMap(lastTracerouteData);
-    }, 100);
+    }, 200);
 }
 
 // Draw traceroute lines on the map
@@ -4054,7 +4084,11 @@ function drawTracerouteOnMap(data) {
     }
 
     if (coordinates.length < 2) {
-        showToast('Not enough nodes have positions to display route', 'warning');
+        const missingNodes = routeWithMe
+            .filter(num => !nodes[num]?.latitude || !nodes[num]?.longitude)
+            .map(num => nodes[num]?.shortName || `!${(num >>> 0).toString(16)}`)
+            .join(', ');
+        showToast(`Cannot display route: missing position for ${missingNodes || 'nodes in route'}`, 'warning');
         return;
     }
 
@@ -4235,26 +4269,51 @@ function initTelemetryDashboard() {
     }
 }
 
-// Update node selector when nodes change
+// Update node selector - only show nodes that have received telemetry data
 function updateTelemetryNodeSelector() {
     const nodeSelect = document.getElementById('telemetryNodeSelect');
     if (!nodeSelect) return;
 
     const currentValue = nodeSelect.value;
 
+    // Get nodes that have telemetry data
+    const nodesWithTelemetry = Object.keys(telemetryData)
+        .map(num => parseInt(num))
+        .filter(num => {
+            const data = telemetryData[num];
+            return data && (data.device || data.environment || data.power || data.airQuality);
+        })
+        .sort((a, b) => {
+            // Sort by name
+            const nodeA = nodes[a];
+            const nodeB = nodes[b];
+            const nameA = nodeA?.shortName || nodeA?.longName || '';
+            const nameB = nodeB?.shortName || nodeB?.longName || '';
+            return nameA.localeCompare(nameB);
+        });
+
     nodeSelect.innerHTML = '<option value="">Select a node...</option>';
 
-    Object.values(nodes).forEach(node => {
-        const name = node.longName || node.shortName || `Node ${node.num}`;
-        const nodeId = `!${(node.num >>> 0).toString(16)}`;
+    if (nodesWithTelemetry.length === 0) {
         const option = document.createElement('option');
-        option.value = node.num;
+        option.disabled = true;
+        option.textContent = 'No telemetry data received yet';
+        nodeSelect.appendChild(option);
+        return;
+    }
+
+    nodesWithTelemetry.forEach(nodeNum => {
+        const node = nodes[nodeNum];
+        const name = node?.longName || node?.shortName || `Node ${nodeNum}`;
+        const nodeId = `!${(nodeNum >>> 0).toString(16)}`;
+        const option = document.createElement('option');
+        option.value = nodeNum;
         option.textContent = `${name} (${nodeId})`;
         nodeSelect.appendChild(option);
     });
 
     // Restore selection if still valid
-    if (currentValue && nodes[currentValue]) {
+    if (currentValue && telemetryData[currentValue]) {
         nodeSelect.value = currentValue;
     }
 }
@@ -4287,6 +4346,7 @@ async function requestTelemetryForNode(nodeNum) {
 function handleDeviceTelemetry(data) {
     const { nodeNum, batteryLevel, voltage, channelUtilization, airUtilTx, uptimeSeconds } = data;
 
+    const isNewNode = !telemetryData[nodeNum];
     if (!telemetryData[nodeNum]) telemetryData[nodeNum] = {};
     telemetryData[nodeNum].device = {
         batteryLevel,
@@ -4306,6 +4366,11 @@ function handleDeviceTelemetry(data) {
         nodes[nodeNum].uptime = uptimeSeconds;
     }
 
+    // Update selector if this is first telemetry from this node
+    if (isNewNode) {
+        updateTelemetryNodeSelector();
+    }
+
     if (selectedTelemetryNode === nodeNum) {
         renderTelemetryDashboard(nodeNum);
     }
@@ -4315,6 +4380,7 @@ function handleDeviceTelemetry(data) {
 function handleEnvironmentTelemetry(data) {
     const { nodeNum, temperature, relativeHumidity, barometricPressure, iaq } = data;
 
+    const isNewNode = !telemetryData[nodeNum];
     if (!telemetryData[nodeNum]) telemetryData[nodeNum] = {};
     telemetryData[nodeNum].environment = {
         temperature,
@@ -4332,6 +4398,11 @@ function handleEnvironmentTelemetry(data) {
         nodes[nodeNum].iaq = iaq;
     }
 
+    // Update selector if this is first telemetry from this node
+    if (isNewNode) {
+        updateTelemetryNodeSelector();
+    }
+
     if (selectedTelemetryNode === nodeNum) {
         renderTelemetryDashboard(nodeNum);
     }
@@ -4341,8 +4412,11 @@ function handleEnvironmentTelemetry(data) {
 function handlePowerTelemetry(data) {
     const { nodeNum } = data;
 
+    const isNewNode = !telemetryData[nodeNum];
     if (!telemetryData[nodeNum]) telemetryData[nodeNum] = {};
     telemetryData[nodeNum].power = { ...data, timestamp: Date.now() };
+
+    if (isNewNode) updateTelemetryNodeSelector();
 
     if (selectedTelemetryNode === nodeNum) {
         renderTelemetryDashboard(nodeNum);
@@ -4353,8 +4427,11 @@ function handlePowerTelemetry(data) {
 function handleAirQualityTelemetry(data) {
     const { nodeNum } = data;
 
+    const isNewNode = !telemetryData[nodeNum];
     if (!telemetryData[nodeNum]) telemetryData[nodeNum] = {};
     telemetryData[nodeNum].airQuality = { ...data, timestamp: Date.now() };
+
+    if (isNewNode) updateTelemetryNodeSelector();
 
     if (selectedTelemetryNode === nodeNum) {
         renderTelemetryDashboard(nodeNum);
@@ -4365,6 +4442,7 @@ function handleAirQualityTelemetry(data) {
 function handleLocalStatsTelemetry(data) {
     const { nodeNum, uptimeSeconds, channelUtilization, airUtilTx } = data;
 
+    const isNewNode = !telemetryData[nodeNum];
     if (!telemetryData[nodeNum]) telemetryData[nodeNum] = {};
     telemetryData[nodeNum].localStats = { ...data, timestamp: Date.now() };
 
@@ -4373,6 +4451,8 @@ function handleLocalStatsTelemetry(data) {
     if (uptimeSeconds) telemetryData[nodeNum].device.uptimeSeconds = uptimeSeconds;
     if (channelUtilization) telemetryData[nodeNum].device.channelUtilization = channelUtilization;
     if (airUtilTx) telemetryData[nodeNum].device.airUtilTx = airUtilTx;
+
+    if (isNewNode) updateTelemetryNodeSelector();
 
     if (selectedTelemetryNode === nodeNum) {
         renderTelemetryDashboard(nodeNum);
@@ -4486,6 +4566,37 @@ if (_originalLoadNodes) {
 }
 
 // ==========================================
+// POSITION UPDATES
+// ==========================================
+
+// Handle position update WebSocket event (e.g., from MQTT)
+function handlePositionUpdated(data) {
+    const nodeNum = data.nodeNum || data.from;
+    if (!nodeNum) {
+        console.warn('Invalid position update data:', data);
+        return;
+    }
+
+    // Update or create node with new position
+    let node = nodes[nodeNum];
+    if (!node) {
+        node = { num: nodeNum };
+        nodes[nodeNum] = node;
+    }
+
+    if (data.latitude !== undefined) node.latitude = data.latitude;
+    if (data.longitude !== undefined) node.longitude = data.longitude;
+    if (data.altitude !== undefined) node.altitude = data.altitude;
+    if (data.viaMqtt !== undefined) node.viaMqtt = data.viaMqtt;
+    node.lastHeard = Date.now() / 1000;
+
+    console.debug(`Position update for ${nodeNum}: lat=${node.latitude}, lon=${node.longitude}`);
+
+    renderNodeList();
+    updateMapMarker(node);
+}
+
+// ==========================================
 // NEIGHBOR INFO PANEL
 // ==========================================
 
@@ -4535,7 +4646,7 @@ function renderNeighborLists() {
     container.innerHTML = nodeNums.map(nodeNum => {
         const info = neighborInfoData[nodeNum];
         const node = nodes[nodeNum];
-        const nodeName = node?.user?.shortName || node?.user?.longName || `!${parseInt(nodeNum).toString(16)}`;
+        const nodeName = node?.shortName || node?.longName || `!${parseInt(nodeNum).toString(16)}`;
         const nodeId = `!${parseInt(nodeNum).toString(16)}`;
         const neighbors = info.neighbors || [];
 
@@ -4543,7 +4654,7 @@ function renderNeighborLists() {
             <div class="neighbor-card">
                 <div class="neighbor-card-header">
                     <div class="neighbor-card-avatar" style="background: ${getNodeColor(nodeNum)}">
-                        ${nodeName.charAt(0).toUpperCase()}
+                        ${nodeName.substring(0, 2).toUpperCase()}
                     </div>
                     <div class="neighbor-card-info">
                         <div class="neighbor-card-name">${escapeHtml(nodeName)}</div>
@@ -4558,7 +4669,7 @@ function renderNeighborLists() {
                         </li>
                     ` : neighbors.map(neighbor => {
                         const neighborNode = nodes[neighbor.nodeId];
-                        const neighborName = neighborNode?.user?.shortName || neighborNode?.user?.longName || `!${neighbor.nodeId.toString(16)}`;
+                        const neighborName = neighborNode?.shortName || neighborNode?.longName || `!${neighbor.nodeId.toString(16)}`;
                         const snr = neighbor.snr !== undefined ? neighbor.snr : '--';
                         const snrClass = getSnrClass(neighbor.snr);
 
@@ -4566,7 +4677,7 @@ function renderNeighborLists() {
                             <li class="neighbor-item">
                                 <div class="neighbor-item-info">
                                     <div class="neighbor-item-avatar" style="background: ${getNodeColor(neighbor.nodeId)}">
-                                        ${neighborName.charAt(0).toUpperCase()}
+                                        ${neighborName.substring(0, 2).toUpperCase()}
                                     </div>
                                     <span class="neighbor-item-name">${escapeHtml(neighborName)}</span>
                                 </div>
@@ -4701,7 +4812,8 @@ function renderTopologyGraph() {
     nodeArray.forEach(nodeNum => {
         const pos = positions[nodeNum];
         const node = nodes[nodeNum];
-        const nodeName = node?.user?.shortName || `!${nodeNum.toString(16)}`;
+        const nodeName = node?.shortName || node?.longName || `!${nodeNum.toString(16)}`;
+        const displayName = nodeName.length > 8 ? nodeName.substring(0, 8) + '…' : nodeName;
         const color = getNodeColor(nodeNum);
         const hasNeighborInfo = neighborInfoData[nodeNum] !== undefined;
 
@@ -4709,10 +4821,10 @@ function renderTopologyGraph() {
             <g class="topology-node" transform="translate(${pos.x}, ${pos.y})">
                 <circle r="20" fill="${color}" stroke="${hasNeighborInfo ? 'var(--primary)' : 'var(--outline)'}" stroke-width="${hasNeighborInfo ? 3 : 1}"/>
                 <text y="5" text-anchor="middle" fill="white" font-size="11" font-weight="600">
-                    ${nodeName.charAt(0).toUpperCase()}
+                    ${nodeName.substring(0, 2).toUpperCase()}
                 </text>
                 <text y="38" text-anchor="middle" fill="var(--on-surface)" font-size="10">
-                    ${escapeHtml(nodeName)}
+                    ${escapeHtml(displayName)}
                 </text>
             </g>
         `;
@@ -5053,8 +5165,27 @@ const emojiToCode = {
 
 function toggleWaypointPanel() {
     const panel = document.getElementById('waypointPanel');
+    const icon = document.getElementById('waypointToggleIcon');
     if (panel) {
         panel.classList.toggle('collapsed');
+        // Rotate icon when expanded
+        if (icon) {
+            icon.style.transform = panel.classList.contains('collapsed') ? '' : 'rotate(180deg)';
+        }
+    }
+}
+
+function hideWaypointPanel() {
+    const panel = document.getElementById('waypointPanel');
+    if (panel) {
+        panel.classList.add('hidden');
+    }
+}
+
+function showWaypointPanel() {
+    const panel = document.getElementById('waypointPanel');
+    if (panel) {
+        panel.classList.remove('hidden');
     }
 }
 

@@ -273,10 +273,9 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 	node.ViaMqtt = nodeInfo.ViaMqtt
 	node.IsFavorite = nodeInfo.IsFavorite
 
-	// Calculate hops away
-	if nodeInfo.Hops > 0 {
-		node.HopsAway = int32(nodeInfo.Hops)
-	}
+	// Set hops away from the NodeInfo
+	// The frontend will use viaMqtt flag to determine display (MQTT vs Direct)
+	node.HopsAway = int32(nodeInfo.Hops)
 
 	// Update device metrics if available
 	if nodeInfo.DeviceMetrics != nil {
