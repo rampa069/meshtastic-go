@@ -220,6 +220,12 @@ func (s *Server) setupRoutes() {
 			device.POST("/nodedb-reset", s.handleNodeDBReset)
 		}
 
+		// User/Owner settings
+		user := v1.Group("/user")
+		{
+			user.PUT("", s.handleSetOwner)
+		}
+
 		// Quick Chat
 		quickChat := v1.Group("/quick-chat")
 		{
@@ -1162,6 +1168,31 @@ func (s *Server) handleFactoryReset(c *gin.Context) {
 func (s *Server) handleNodeDBReset(c *gin.Context) {
 	// TODO: Implement node DB reset
 	c.JSON(http.StatusNotImplemented, gin.H{"error": "not implemented"})
+}
+
+// User/Owner handlers
+func (s *Server) handleSetOwner(c *gin.Context) {
+	var req struct {
+		LongName  string `json:"longName"`
+		ShortName string `json:"shortName"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user := &pb.User{
+		LongName:  req.LongName,
+		ShortName: req.ShortName,
+	}
+
+	packetId, err := s.meshService.SetOwner(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
 // Quick chat handlers

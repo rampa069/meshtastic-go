@@ -2339,6 +2339,20 @@ func MarshalAdminMessage(a *AdminMessage) ([]byte, error) {
 		buf = append(buf, tmp[:n]...)
 		n = EncodeVarint(tmp, uint64(v.FactoryReset))
 		buf = append(buf, tmp[:n]...)
+
+	case *AdminMessage_SetOwner:
+		if v.SetOwner != nil {
+			userData, err := MarshalUser(v.SetOwner)
+			if err != nil {
+				return nil, err
+			}
+			// Field 3: set_owner
+			n := EncodeVarint(tmp, EncodeTag(3, WireBytes))
+			buf = append(buf, tmp[:n]...)
+			n = EncodeVarint(tmp, uint64(len(userData)))
+			buf = append(buf, tmp[:n]...)
+			buf = append(buf, userData...)
+		}
 	}
 
 	return buf, nil

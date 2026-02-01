@@ -466,6 +466,14 @@ func (ms *MeshService) Shutdown(seconds int32) (uint32, error) {
 	return ms.sender.SendShutdown(seconds)
 }
 
+// SetOwner sets the owner/user info on the device
+func (ms *MeshService) SetOwner(user *pb.User) (uint32, error) {
+	if ms.sender == nil {
+		return 0, fmt.Errorf("not connected")
+	}
+	return ms.sender.SetOwner(user)
+}
+
 // NodeManager returns the node manager
 func (ms *MeshService) NodeManager() *NodeManager {
 	return ms.nodeManager

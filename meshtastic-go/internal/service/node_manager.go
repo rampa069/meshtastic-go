@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -26,6 +27,8 @@ type Node struct {
 	ShortName        string  `json:"shortName"`
 	HardwareModel    string  `json:"hardwareModel"`
 	Role             string  `json:"role"`
+	PublicKey        string  `json:"publicKey,omitempty"`
+	IsLicensed       bool    `json:"isLicensed,omitempty"`
 
 	// Position
 	Latitude         float64 `json:"latitude"`
@@ -247,6 +250,10 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 		node.LongName = nodeInfo.User.LongName
 		node.ShortName = nodeInfo.User.ShortName
 		node.HardwareModel = nodeInfo.User.HwModel.String()
+		node.IsLicensed = nodeInfo.User.IsLicensed
+		if len(nodeInfo.User.PublicKey) > 0 {
+			node.PublicKey = fmt.Sprintf("%x", nodeInfo.User.PublicKey)
+		}
 	}
 
 	// Update from position

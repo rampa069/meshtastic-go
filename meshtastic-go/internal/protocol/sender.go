@@ -806,6 +806,26 @@ func (s *Sender) SendShutdown(seconds int32) (uint32, error) {
 	return s.SendAdminMessage(myNodeNum, adminData)
 }
 
+// SetOwner sets the owner/user info on the device
+func (s *Sender) SetOwner(user *pb.User) (uint32, error) {
+	adminMsg := &pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_SetOwner{SetOwner: user},
+	}
+
+	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	if err != nil {
+		return 0, fmt.Errorf("failed to marshal set owner admin message: %w", err)
+	}
+
+	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
+	log.Info().
+		Str("longName", user.LongName).
+		Str("shortName", user.ShortName).
+		Msg("setting owner info")
+
+	return s.SendAdminMessage(myNodeNum, adminData)
+}
+
 // sendFramed sends data to the radio
 // Note: The actual framing is done by the transport layer (HandleSendToRadio)
 func (s *Sender) sendFramed(data []byte) error {

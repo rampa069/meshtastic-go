@@ -2161,6 +2161,37 @@ function renderConfig() {
             </div>
         </div>
 
+        <!-- User Config (Editable) -->
+        <div class="config-section collapsible" data-section="user">
+            <div class="config-section-header" onclick="toggleConfigSection('user')">
+                <span class="section-title">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    User / Owner
+                </span>
+                <svg class="collapse-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+            </div>
+            <div class="config-items">
+                <div class="config-item editable">
+                    <span class="config-item-label">Long Name</span>
+                    <input type="text" class="config-item-input" data-config="user.longName"
+                           value="${myNode?.longName || ''}" maxlength="39"
+                           onchange="markConfigChanged('user')">
+                </div>
+                <div class="config-item editable">
+                    <span class="config-item-label">Short Name</span>
+                    <input type="text" class="config-item-input" data-config="user.shortName"
+                           value="${myNode?.shortName || ''}" maxlength="4"
+                           onchange="markConfigChanged('user')">
+                </div>
+                ${configItem('Node ID', myNode ? '!' + (myNode.num >>> 0).toString(16) : 'Unknown')}
+                ${configItem('Licensed', myNode?.isLicensed, 'bool')}
+                ${myNode?.publicKey ? configItem('Public Key', myNode.publicKey.substring(0, 16) + '...') : ''}
+            </div>
+            <div class="config-actions" id="userActions" style="display: none;">
+                <button class="btn btn-primary btn-sm" onclick="saveUserConfig()">Save User Config</button>
+            </div>
+        </div>
+
         <!-- Device Config (Editable) -->
         <div class="config-section collapsible" data-section="device">
             <div class="config-section-header" onclick="toggleConfigSection('device')">
@@ -2740,6 +2771,27 @@ async function saveDeviceConfig() {
         clearConfigChanged('device');
     } catch (e) {
         console.error('Failed to save device config:', e);
+        showToast('Error', e.message, 'error');
+    }
+}
+
+async function saveUserConfig() {
+    const config = {
+        longName: getConfigValue('user.longName'),
+        shortName: getConfigValue('user.shortName')
+    };
+
+    try {
+        await api('PUT', '/user', config);
+        showToast('User Config Saved', 'Changes sent to device');
+        clearConfigChanged('user');
+        // Update myNode with new values
+        if (myNode) {
+            myNode.longName = config.longName;
+            myNode.shortName = config.shortName;
+        }
+    } catch (e) {
+        console.error('Failed to save user config:', e);
         showToast('Error', e.message, 'error');
     }
 }
