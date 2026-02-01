@@ -3429,6 +3429,31 @@ func MarshalTelemetryConfig(tc *ModuleConfig_TelemetryConfig) ([]byte, error) {
 		buf = append(buf, tmp[:n]...)
 	}
 
+	if tc.PowerScreenEnabled {
+		n := EncodeVarint(tmp, EncodeTag(10, WireVarint))
+		buf = append(buf, tmp[:n]...)
+		buf = append(buf, 1)
+	}
+
+	if tc.HealthMeasurementEnabled {
+		n := EncodeVarint(tmp, EncodeTag(11, WireVarint))
+		buf = append(buf, tmp[:n]...)
+		buf = append(buf, 1)
+	}
+
+	if tc.HealthUpdateInterval != 0 {
+		n := EncodeVarint(tmp, EncodeTag(12, WireVarint))
+		buf = append(buf, tmp[:n]...)
+		n = EncodeVarint(tmp, uint64(tc.HealthUpdateInterval))
+		buf = append(buf, tmp[:n]...)
+	}
+
+	if tc.HealthScreenEnabled {
+		n := EncodeVarint(tmp, EncodeTag(13, WireVarint))
+		buf = append(buf, tmp[:n]...)
+		buf = append(buf, 1)
+	}
+
 	return buf, nil
 }
 
@@ -4243,6 +4268,30 @@ func UnmarshalTelemetryModuleConfig(buf []byte) (*ModuleConfig_TelemetryConfig, 
 				break
 			}
 			tc.PowerScreenEnabled = v != 0
+			offset += vn
+
+		case 11: // health_measurement_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.HealthMeasurementEnabled = v != 0
+			offset += vn
+
+		case 12: // health_update_interval
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.HealthUpdateInterval = uint32(v)
+			offset += vn
+
+		case 13: // health_screen_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.HealthScreenEnabled = v != 0
 			offset += vn
 
 		default:

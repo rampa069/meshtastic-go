@@ -2024,7 +2024,16 @@ function updateModuleCards() {
     for (const [id, config] of Object.entries(moduleMapping)) {
         const card = document.querySelector(`.module-card[onclick*="'${id}'"]`);
         if (card) {
-            const isEnabled = config?.enabled || false;
+            let isEnabled = false;
+            if (id === 'telemetry') {
+                // Telemetry doesn't have a global enabled flag - check if any subsystem is enabled
+                isEnabled = config?.deviceUpdateInterval > 0 ||
+                           config?.environmentMeasurementEnabled ||
+                           config?.airQualityEnabled ||
+                           config?.powerMeasurementEnabled;
+            } else {
+                isEnabled = config?.enabled || false;
+            }
             card.classList.toggle('enabled', isEnabled);
             const statusEl = card.querySelector('.module-status');
             if (statusEl) {
