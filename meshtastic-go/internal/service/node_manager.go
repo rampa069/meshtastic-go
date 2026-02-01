@@ -346,22 +346,42 @@ func (nm *NodeManager) UpdateNodeTelemetry(nodeNum uint32, telemetry *pb.Telemet
 		nm.nodes[nodeNum] = node
 	}
 
-	// Update device metrics
+	// Update device metrics - only update non-zero values to preserve existing data
 	if dm := telemetry.GetDeviceMetrics(); dm != nil {
-		node.BatteryLevel = int32(dm.BatteryLevel)
-		node.Voltage = dm.Voltage
-		node.ChannelUtilization = dm.ChannelUtilization
-		node.AirUtilTx = dm.AirUtilTx
-		node.Uptime = int64(dm.UptimeSeconds)
+		if dm.BatteryLevel != 0 {
+			node.BatteryLevel = int32(dm.BatteryLevel)
+		}
+		if dm.Voltage != 0 {
+			node.Voltage = dm.Voltage
+		}
+		if dm.ChannelUtilization != 0 {
+			node.ChannelUtilization = dm.ChannelUtilization
+		}
+		if dm.AirUtilTx != 0 {
+			node.AirUtilTx = dm.AirUtilTx
+		}
+		if dm.UptimeSeconds != 0 {
+			node.Uptime = int64(dm.UptimeSeconds)
+		}
 	}
 
-	// Update environment metrics
+	// Update environment metrics - only update non-zero values to preserve existing data
 	if em := telemetry.GetEnvironmentMetrics(); em != nil {
-		node.Temperature = em.Temperature
-		node.RelativeHumidity = em.RelativeHumidity
-		node.BarometricPressure = em.BarometricPressure
-		node.GasResistance = em.GasResistance
-		node.Iaq = int32(em.Iaq)
+		if em.Temperature != 0 {
+			node.Temperature = em.Temperature
+		}
+		if em.RelativeHumidity != 0 {
+			node.RelativeHumidity = em.RelativeHumidity
+		}
+		if em.BarometricPressure != 0 {
+			node.BarometricPressure = em.BarometricPressure
+		}
+		if em.GasResistance != 0 {
+			node.GasResistance = em.GasResistance
+		}
+		if em.Iaq != 0 {
+			node.Iaq = int32(em.Iaq)
+		}
 	}
 
 	node.LastHeard = time.Now().Unix()

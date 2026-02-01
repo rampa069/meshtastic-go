@@ -77,9 +77,30 @@ func (ts *TelemetryService) ProcessTelemetry(nodeNum uint32, telemetry *pb.Telem
 }
 
 func (ts *TelemetryService) processDeviceMetrics(nodeNum uint32, dm *pb.DeviceMetrics, timestamp int64, viaMqtt bool) {
-	ts.latestDevice[nodeNum] = dm
+	// Merge with existing metrics to preserve data from partial updates
+	existing := ts.latestDevice[nodeNum]
+	if existing == nil {
+		existing = &pb.DeviceMetrics{}
+	}
+	// Only update non-zero values
+	if dm.BatteryLevel != 0 {
+		existing.BatteryLevel = dm.BatteryLevel
+	}
+	if dm.Voltage != 0 {
+		existing.Voltage = dm.Voltage
+	}
+	if dm.ChannelUtilization != 0 {
+		existing.ChannelUtilization = dm.ChannelUtilization
+	}
+	if dm.AirUtilTx != 0 {
+		existing.AirUtilTx = dm.AirUtilTx
+	}
+	if dm.UptimeSeconds != 0 {
+		existing.UptimeSeconds = dm.UptimeSeconds
+	}
+	ts.latestDevice[nodeNum] = existing
 
-	// Store in database
+	// Store in database (use merged values)
 	entity := &dao.TelemetryEntity{
 		NodeNum:       nodeNum,
 		TelemetryType: dao.TelemetryTypeDevice,
@@ -87,44 +108,83 @@ func (ts *TelemetryService) processDeviceMetrics(nodeNum uint32, dm *pb.DeviceMe
 		ViaMqtt:       viaMqtt,
 	}
 
-	batteryLevel := int32(dm.BatteryLevel)
+	batteryLevel := int32(existing.BatteryLevel)
 	entity.BatteryLevel = &batteryLevel
-	entity.Voltage = &dm.Voltage
-	entity.ChannelUtilization = &dm.ChannelUtilization
-	entity.AirUtilTx = &dm.AirUtilTx
-	uptimeSeconds := int64(dm.UptimeSeconds)
+	entity.Voltage = &existing.Voltage
+	entity.ChannelUtilization = &existing.ChannelUtilization
+	entity.AirUtilTx = &existing.AirUtilTx
+	uptimeSeconds := int64(existing.UptimeSeconds)
 	entity.UptimeSeconds = &uptimeSeconds
 
 	if err := ts.telemetryDAO.Insert(entity); err != nil {
 		log.Warn().Err(err).Uint32("nodeNum", nodeNum).Msg("failed to store device telemetry")
 	}
 
-	// Broadcast to WebSocket clients
+	// Broadcast to WebSocket clients (use merged values)
 	ts.wsHub.Broadcast(websocket.Event{
 		Type: "telemetry.device",
 		Data: map[string]interface{}{
 			"nodeNum":            nodeNum,
 			"timestamp":          timestamp,
-			"batteryLevel":       dm.BatteryLevel,
-			"voltage":            dm.Voltage,
-			"channelUtilization": dm.ChannelUtilization,
-			"airUtilTx":          dm.AirUtilTx,
-			"uptimeSeconds":      dm.UptimeSeconds,
+			"batteryLevel":       existing.BatteryLevel,
+			"voltage":            existing.Voltage,
+			"channelUtilization": existing.ChannelUtilization,
+			"airUtilTx":          existing.AirUtilTx,
+			"uptimeSeconds":      existing.UptimeSeconds,
 			"viaMqtt":            viaMqtt,
 		},
 	})
 
 	log.Debug().
 		Uint32("nodeNum", nodeNum).
-		Uint32("battery", dm.BatteryLevel).
-		Float32("voltage", dm.Voltage).
+		Uint32("battery", existing.BatteryLevel).
+		Float32("voltage", existing.Voltage).
 		Msg("processed device telemetry")
 }
 
 func (ts *TelemetryService) processEnvironmentMetrics(nodeNum uint32, em *pb.EnvironmentMetrics, timestamp int64, viaMqtt bool) {
-	ts.latestEnvironment[nodeNum] = em
+	// Merge with existing metrics to preserve data from partial updates
+	existing := ts.latestEnvironment[nodeNum]
+	if existing == nil {
+		existing = &pb.EnvironmentMetrics{}
+	}
+	// Only update non-zero values
+	if em.Temperature != 0 {
+		existing.Temperature = em.Temperature
+	}
+	if em.RelativeHumidity != 0 {
+		existing.RelativeHumidity = em.RelativeHumidity
+	}
+	if em.BarometricPressure != 0 {
+		existing.BarometricPressure = em.BarometricPressure
+	}
+	if em.GasResistance != 0 {
+		existing.GasResistance = em.GasResistance
+	}
+	if em.Iaq != 0 {
+		existing.Iaq = em.Iaq
+	}
+	if em.Distance != 0 {
+		existing.Distance = em.Distance
+	}
+	if em.Lux != 0 {
+		existing.Lux = em.Lux
+	}
+	if em.UvLux != 0 {
+		existing.UvLux = em.UvLux
+	}
+	if em.WindSpeed != 0 {
+		existing.WindSpeed = em.WindSpeed
+	}
+	if em.WindDirection != 0 {
+		existing.WindDirection = em.WindDirection
+	}
+	if em.Rainfall != 0 {
+		existing.Rainfall = em.Rainfall
+	}
+	ts.latestEnvironment[nodeNum] = existing
 
-	// Store in database
+	// Store in database (use merged values)
 	entity := &dao.TelemetryEntity{
 		NodeNum:       nodeNum,
 		TelemetryType: dao.TelemetryTypeEnvironment,
@@ -132,49 +192,49 @@ func (ts *TelemetryService) processEnvironmentMetrics(nodeNum uint32, em *pb.Env
 		ViaMqtt:       viaMqtt,
 	}
 
-	entity.Temperature = &em.Temperature
-	entity.RelativeHumidity = &em.RelativeHumidity
-	entity.BarometricPressure = &em.BarometricPressure
-	entity.GasResistance = &em.GasResistance
-	iaq := int32(em.Iaq)
+	entity.Temperature = &existing.Temperature
+	entity.RelativeHumidity = &existing.RelativeHumidity
+	entity.BarometricPressure = &existing.BarometricPressure
+	entity.GasResistance = &existing.GasResistance
+	iaq := int32(existing.Iaq)
 	entity.Iaq = &iaq
-	entity.Distance = &em.Distance
-	entity.Lux = &em.Lux
-	entity.UvLux = &em.UvLux
-	entity.WindSpeed = &em.WindSpeed
-	windDir := int32(em.WindDirection)
+	entity.Distance = &existing.Distance
+	entity.Lux = &existing.Lux
+	entity.UvLux = &existing.UvLux
+	entity.WindSpeed = &existing.WindSpeed
+	windDir := int32(existing.WindDirection)
 	entity.WindDirection = &windDir
-	entity.Rainfall = &em.Rainfall
+	entity.Rainfall = &existing.Rainfall
 
 	if err := ts.telemetryDAO.Insert(entity); err != nil {
 		log.Warn().Err(err).Uint32("nodeNum", nodeNum).Msg("failed to store environment telemetry")
 	}
 
-	// Broadcast to WebSocket clients
+	// Broadcast to WebSocket clients (use merged values)
 	ts.wsHub.Broadcast(websocket.Event{
 		Type: "telemetry.environment",
 		Data: map[string]interface{}{
 			"nodeNum":            nodeNum,
 			"timestamp":          timestamp,
-			"temperature":        em.Temperature,
-			"relativeHumidity":   em.RelativeHumidity,
-			"barometricPressure": em.BarometricPressure,
-			"gasResistance":      em.GasResistance,
-			"iaq":                em.Iaq,
-			"distance":           em.Distance,
-			"lux":                em.Lux,
-			"uvLux":              em.UvLux,
-			"windSpeed":          em.WindSpeed,
-			"windDirection":      em.WindDirection,
-			"rainfall":           em.Rainfall,
+			"temperature":        existing.Temperature,
+			"relativeHumidity":   existing.RelativeHumidity,
+			"barometricPressure": existing.BarometricPressure,
+			"gasResistance":      existing.GasResistance,
+			"iaq":                existing.Iaq,
+			"distance":           existing.Distance,
+			"lux":                existing.Lux,
+			"uvLux":              existing.UvLux,
+			"windSpeed":          existing.WindSpeed,
+			"windDirection":      existing.WindDirection,
+			"rainfall":           existing.Rainfall,
 			"viaMqtt":            viaMqtt,
 		},
 	})
 
 	log.Debug().
 		Uint32("nodeNum", nodeNum).
-		Float32("temp", em.Temperature).
-		Float32("humidity", em.RelativeHumidity).
+		Float32("temp", existing.Temperature).
+		Float32("humidity", existing.RelativeHumidity).
 		Msg("processed environment telemetry")
 }
 
