@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/meshtastic/meshtastic-go/internal/util"
 	"github.com/meshtastic/meshtastic-go/internal/websocket"
 	"github.com/meshtastic/meshtastic-go/pkg/pb"
+	"github.com/meshtastic/meshtastic-go/web"
 )
 
 // Server represents the HTTP server
@@ -265,12 +267,21 @@ func (s *Server) setupRoutes() {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	// Serve static files
-	s.router.Static("/static", "./web/static")
+	// Serve embedded static files
+	staticFS, err := web.StaticFS()
+	if err != nil {
+		panic("failed to load embedded static files: " + err.Error())
+	}
+	s.router.StaticFS("/static", http.FS(staticFS))
 
 	// Serve index.html for root
 	s.router.GET("/", func(c *gin.Context) {
-		c.File("./web/static/index.html")
+		indexFile, err := fs.ReadFile(staticFS, "index.html")
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Failed to load index.html")
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", indexFile)
 	})
 }
 
