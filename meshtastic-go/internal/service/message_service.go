@@ -49,6 +49,7 @@ type Message struct {
 	Read         bool          `json:"read"`
 	Status       MessageStatus `json:"status"`
 	PacketID     int32         `json:"packetId"`
+	ReplyTo      int32         `json:"replyTo,omitempty"` // Packet ID of message being replied to
 	SNR          float32       `json:"snr"`
 	RSSI         int32         `json:"rssi"`
 	HopsAway     int32         `json:"hopsAway"`

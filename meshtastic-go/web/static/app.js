@@ -16,6 +16,7 @@ let mapMarkers = {};
 let selectedChannel = null;
 let channelMessages = {}; // Messages keyed by channel index
 let channelUnreadCounts = {}; // Unread message counts per channel
+let replyingTo = null; // Message being replied to
 let myNode = null; // Local node info
 let nodeSearchQuery = '';
 let nodeSortBy = 'lastHeard';
@@ -1350,8 +1351,32 @@ function renderMessageBubble(msg, isChannel) {
     const reactionsHtml = renderReactions(msg.emojis);
     const signalHtml = !isMe ? renderSignalInfo(msg) : '';
 
+    // Build reply context if this message is a reply
+    let replyContextHtml = '';
+    if (msg.replyTo) {
+        const repliedMsg = findMessageByPacketId(msg.replyTo);
+        if (repliedMsg) {
+            const repliedSenderNode = nodes[repliedMsg.from];
+            const repliedSenderName = repliedMsg.from === myNode?.num ? 'You' :
+                (repliedSenderNode ? (repliedSenderNode.shortName || repliedSenderNode.longName) : `!${(repliedMsg.from >>> 0).toString(16)}`);
+            replyContextHtml = `
+                <div class="reply-context" onclick="scrollToMessage(${msg.replyTo})">
+                    <span class="reply-context-sender">${repliedSenderName}</span>
+                    <span class="reply-context-text">${escapeHtml(repliedMsg.text?.substring(0, 50) || '')}${repliedMsg.text?.length > 50 ? '...' : ''}</span>
+                </div>
+            `;
+        } else {
+            replyContextHtml = `
+                <div class="reply-context">
+                    <span class="reply-context-text">Original message not found</span>
+                </div>
+            `;
+        }
+    }
+
     return `
-        <div class="message ${isMe ? 'sent' : ''}" data-packet-id="${msg.packetId || ''}" data-uuid="${msg.uuid || ''}">
+        <div class="message ${isMe ? 'sent' : ''}" data-packet-id="${msg.packetId || ''}" data-uuid="${msg.uuid || ''}" data-from="${msg.from || ''}" data-text="${escapeHtml(msg.text || '')}">
+            ${replyContextHtml}
             <div class="message-header">
                 <span class="message-sender">${isMe ? 'You' : senderName}</span>
                 <span class="message-time">
@@ -1363,6 +1388,11 @@ function renderMessageBubble(msg, isChannel) {
             ${signalHtml}
             ${reactionsHtml}
             <div class="message-actions">
+                <button class="msg-action-btn reply-btn" title="Reply">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                    </svg>
+                </button>
                 <button class="msg-action-btn react-btn" title="React">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
@@ -1374,6 +1404,20 @@ function renderMessageBubble(msg, isChannel) {
 }
 
 function setupMessageInteractions() {
+    // Setup reply buttons
+    messagesList.querySelectorAll('.reply-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const msgEl = btn.closest('.message');
+            const packetId = parseInt(msgEl.dataset.packetId);
+            const from = parseInt(msgEl.dataset.from);
+            const text = msgEl.dataset.text;
+            if (packetId) {
+                setReplyingTo({ packetId, from, text });
+            }
+        });
+    });
+
     // Setup reaction buttons
     messagesList.querySelectorAll('.react-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -1385,6 +1429,82 @@ function setupMessageInteractions() {
             }
         });
     });
+}
+
+// Find a message by packet ID across all message stores
+function findMessageByPacketId(packetId) {
+    // Search in channel messages
+    for (const channelIdx in channelMessages) {
+        const msg = channelMessages[channelIdx].find(m => m.packetId === packetId);
+        if (msg) return msg;
+    }
+    // Search in direct messages
+    for (const contactKey in messages) {
+        const msg = messages[contactKey].find(m => m.packetId === packetId);
+        if (msg) return msg;
+    }
+    return null;
+}
+
+// Scroll to a specific message
+function scrollToMessage(packetId) {
+    const msgEl = document.querySelector(`.message[data-packet-id="${packetId}"]`);
+    if (msgEl) {
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        msgEl.classList.add('highlight');
+        setTimeout(() => msgEl.classList.remove('highlight'), 2000);
+    }
+}
+
+// Set the message being replied to
+function setReplyingTo(msg) {
+    replyingTo = msg;
+    renderReplyIndicator();
+    document.getElementById('messageInput')?.focus();
+}
+
+// Cancel reply
+function cancelReply() {
+    replyingTo = null;
+    renderReplyIndicator();
+}
+
+// Render the reply indicator above the message input
+function renderReplyIndicator() {
+    let indicator = document.getElementById('replyIndicator');
+
+    if (!replyingTo) {
+        if (indicator) indicator.remove();
+        return;
+    }
+
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'replyIndicator';
+        indicator.className = 'reply-indicator';
+        const inputArea = document.querySelector('.message-input-area');
+        if (inputArea) {
+            inputArea.insertBefore(indicator, inputArea.firstChild);
+        }
+    }
+
+    const senderNode = nodes[replyingTo.from];
+    const senderName = replyingTo.from === myNode?.num ? 'yourself' :
+        (senderNode ? (senderNode.shortName || senderNode.longName) : `!${(replyingTo.from >>> 0).toString(16)}`);
+
+    indicator.innerHTML = `
+        <div class="reply-indicator-content">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+            </svg>
+            <span>Replying to <strong>${senderName}</strong>: ${escapeHtml(replyingTo.text?.substring(0, 40) || '')}${replyingTo.text?.length > 40 ? '...' : ''}</span>
+        </div>
+        <button class="reply-cancel-btn" onclick="cancelReply()" title="Cancel reply">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        </button>
+    `;
 }
 
 function showEmojiPicker(anchorEl, packetId) {
@@ -1515,17 +1635,25 @@ async function sendMessage() {
     if (!selectedNode && !selectedChannel) return;
 
     const text = messageInput.value.trim();
+    const replyToPacketId = replyingTo?.packetId || null;
     messageInput.value = '';
     sendBtn.disabled = true;
+
+    // Clear reply state
+    cancelReply();
 
     try {
         if (selectedChannel) {
             // Send to channel (broadcast)
-            await api('POST', '/messages', {
+            const payload = {
                 to: 0xFFFFFFFF, // Broadcast address
                 channel: selectedChannel.index,
                 text: text
-            });
+            };
+            if (replyToPacketId) {
+                payload.replyTo = replyToPacketId;
+            }
+            await api('POST', '/messages', payload);
 
             // Add message to local channel messages
             const newMsg = {
@@ -1534,7 +1662,8 @@ async function sendMessage() {
                 channel: selectedChannel.index,
                 text: text,
                 time: Math.floor(Date.now() / 1000),
-                status: 'queued'
+                status: 'queued',
+                replyTo: replyToPacketId
             };
             if (!channelMessages[selectedChannel.index]) {
                 channelMessages[selectedChannel.index] = [];
@@ -1544,11 +1673,15 @@ async function sendMessage() {
         } else if (selectedNode) {
             // Send to specific node (DM)
             const to = selectedNode.num;
-            await api('POST', '/messages', {
+            const payload = {
                 to: to,
                 channel: 0,
                 text: text
-            });
+            };
+            if (replyToPacketId) {
+                payload.replyTo = replyToPacketId;
+            }
+            await api('POST', '/messages', payload);
 
             const contactKey = `!${(to >>> 0).toString(16)}`;
             const newMsg = {
@@ -1557,7 +1690,8 @@ async function sendMessage() {
                 to: to,
                 text: text,
                 time: Math.floor(Date.now() / 1000),
-                status: 'queued'
+                status: 'queued',
+                replyTo: replyToPacketId
             };
             addMessage(newMsg);
         }

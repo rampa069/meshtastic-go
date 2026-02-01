@@ -75,6 +75,7 @@ type SendMessageRequest struct {
 	To      interface{} `json:"to" binding:"required"` // Can be string "!hex" or number
 	Channel int         `json:"channel"`
 	Text    string      `json:"text" binding:"required"`
+	ReplyTo *uint32     `json:"replyTo,omitempty"` // Packet ID of message being replied to
 }
 
 // SendMessage sends a message

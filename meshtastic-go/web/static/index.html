@@ -893,6 +893,101 @@
             background: var(--surface-variant);
         }
 
+        .message-actions {
+            gap: 0.25rem;
+        }
+
+        /* Reply context in messages */
+        .reply-context {
+            background: var(--surface-variant);
+            border-left: 3px solid var(--primary);
+            padding: 0.375rem 0.625rem;
+            margin-bottom: 0.375rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .reply-context:hover {
+            background: var(--outline-variant);
+        }
+
+        .reply-context-sender {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .reply-context-text {
+            color: var(--on-surface-variant);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Reply indicator above input */
+        .reply-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-variant);
+            border-left: 3px solid var(--primary);
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .reply-indicator-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            color: var(--on-surface-variant);
+            min-width: 0;
+            flex: 1;
+        }
+
+        .reply-indicator-content svg {
+            flex-shrink: 0;
+            color: var(--primary);
+        }
+
+        .reply-indicator-content span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reply-cancel-btn {
+            padding: 0.25rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--on-surface-variant);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .reply-cancel-btn:hover {
+            background: var(--outline-variant);
+            color: var(--error);
+        }
+
+        /* Message highlight animation */
+        .message.highlight {
+            animation: highlightPulse 2s ease-out;
+        }
+
+        @keyframes highlightPulse {
+            0% { background: var(--primary-container); }
+            100% { background: transparent; }
+        }
+
         .emoji-picker {
             background: var(--surface);
             border: 1px solid var(--outline-variant);
