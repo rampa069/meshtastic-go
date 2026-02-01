@@ -1,4 +1,4 @@
-.PHONY: all build clean proto proto-gen proto-install test lint deps run
+.PHONY: all build build-all build-windows clean proto proto-gen proto-install test lint deps run
 
 VERSION ?= $(shell git describe --tags --always 2>/dev/null || echo "dev")
 LDFLAGS := -ldflags "-X main.version=$(VERSION)"
@@ -50,6 +50,12 @@ build-all:
 	GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o bin/meshtastic-darwin-amd64 ./cmd/meshtastic
 	GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o bin/meshtastic-darwin-arm64 ./cmd/meshtastic
 	GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o bin/meshtastic-windows-amd64.exe ./cmd/meshtastic
+	GOOS=windows GOARCH=arm64 go build $(LDFLAGS) -o bin/meshtastic-windows-arm64.exe ./cmd/meshtastic
+
+build-windows:
+	@echo "Building for Windows..."
+	GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o bin/meshtastic-windows-amd64.exe ./cmd/meshtastic
+	GOOS=windows GOARCH=arm64 go build $(LDFLAGS) -o bin/meshtastic-windows-arm64.exe ./cmd/meshtastic
 
 clean:
 	rm -rf bin/
