@@ -1336,7 +1336,8 @@ function renderMessageBubble(msg, isChannel) {
     };
 
     if (isChannel) {
-        const senderNode = nodes[msg.from];
+        // Use >>> 0 to convert signed int32 to unsigned for node lookup
+        const senderNode = nodes[msg.from >>> 0];
         senderName = formatNodeName(senderNode, msg.from);
     } else if (selectedNode) {
         senderName = formatNodeName(selectedNode, selectedNode.num);
@@ -1356,8 +1357,9 @@ function renderMessageBubble(msg, isChannel) {
     if (msg.replyTo) {
         const repliedMsg = findMessageByPacketId(msg.replyTo);
         if (repliedMsg) {
-            const repliedSenderNode = nodes[repliedMsg.from];
-            const repliedSenderName = repliedMsg.from === myNode?.num ? 'You' :
+            // Use >>> 0 to convert signed int32 to unsigned for node lookup
+            const repliedSenderNode = nodes[repliedMsg.from >>> 0];
+            const repliedSenderName = (repliedMsg.from >>> 0) === myNode?.num ? 'You' :
                 (repliedSenderNode ? (repliedSenderNode.shortName || repliedSenderNode.longName) : `!${(repliedMsg.from >>> 0).toString(16)}`);
             replyContextHtml = `
                 <div class="reply-context" onclick="scrollToMessage(${msg.replyTo})">
@@ -1488,8 +1490,9 @@ function renderReplyIndicator() {
         }
     }
 
-    const senderNode = nodes[replyingTo.from];
-    const senderName = replyingTo.from === myNode?.num ? 'yourself' :
+    // Use >>> 0 to convert signed int32 to unsigned for node lookup
+    const senderNode = nodes[replyingTo.from >>> 0];
+    const senderName = (replyingTo.from >>> 0) === myNode?.num ? 'yourself' :
         (senderNode ? (senderNode.shortName || senderNode.longName) : `!${(replyingTo.from >>> 0).toString(16)}`);
 
     indicator.innerHTML = `

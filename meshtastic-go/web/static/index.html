@@ -882,15 +882,31 @@
             border: 1px solid var(--outline-variant);
             border-radius: 50%;
             cursor: pointer;
-            opacity: 0.7;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: var(--on-surface);
         }
 
         .msg-action-btn:hover {
-            opacity: 1;
             background: var(--surface-variant);
+        }
+
+        .msg-action-btn svg {
+            fill: var(--on-surface);
+        }
+
+        .message.sent .msg-action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .message.sent .msg-action-btn svg {
+            fill: var(--on-primary);
+        }
+
+        .message.sent .msg-action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .message-actions {
