@@ -18,7 +18,7 @@ radio:
 
 mqtt:
   enabled: false
-  server: "mqtt.meshtastic.org"
+  server: "mqtt.meshtastic.es"
   port: 1883
   username: ""
   password: ""

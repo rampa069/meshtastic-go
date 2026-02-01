@@ -1,7 +1,7 @@
 # Binaries
-meshtastic
-meshtastic-go
-bin/
+/meshtastic
+/meshtastic-go
+/bin/
 *.exe
 
 # Database files
