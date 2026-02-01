@@ -4997,13 +4997,21 @@ function handleNeighborInfoUpdated(data) {
 
     console.log('Neighbor info updated:', data);
 
+    const neighbors = data.neighbors || [];
+
     neighborInfoData[nodeNum] = {
-        neighbors: data.neighbors || [],
+        neighbors: neighbors,
         lastUpdate: Date.now()
     };
 
+    // Sync with nodes store so updateNeighborLines() works
+    if (nodes[nodeNum]) {
+        nodes[nodeNum].neighbors = neighbors;
+    }
+
     renderNeighborLists();
     renderTopologyGraph();
+    updateNeighborLines();
 }
 
 // Render neighbor lists for all nodes with neighbor info
@@ -5029,18 +5037,21 @@ function renderNeighborLists() {
     container.innerHTML = nodeNums.map(nodeNum => {
         const info = neighborInfoData[nodeNum];
         const node = nodes[nodeNum];
-        const nodeName = node?.shortName || node?.longName || `!${parseInt(nodeNum).toString(16)}`;
+        const shortName = node?.shortName || '';
+        const longName = node?.longName || '';
         const nodeId = `!${parseInt(nodeNum).toString(16)}`;
+        const displayName = longName || shortName || nodeId;
+        const avatarText = shortName || longName?.substring(0, 4) || nodeId.substring(1, 5);
         const neighbors = info.neighbors || [];
 
         return `
             <div class="neighbor-card">
                 <div class="neighbor-card-header">
                     <div class="neighbor-card-avatar" style="background: ${getNodeColor(nodeNum)}">
-                        ${nodeName.substring(0, 2).toUpperCase()}
+                        ${avatarText.substring(0, 4).toUpperCase()}
                     </div>
                     <div class="neighbor-card-info">
-                        <div class="neighbor-card-name">${escapeHtml(nodeName)}</div>
+                        <div class="neighbor-card-name">${escapeHtml(displayName)}${shortName && longName ? ` (${escapeHtml(shortName)})` : ''}</div>
                         <div class="neighbor-card-id">${nodeId}</div>
                     </div>
                     <div class="neighbor-card-count">${neighbors.length} neighbors</div>
@@ -5052,7 +5063,11 @@ function renderNeighborLists() {
                         </li>
                     ` : neighbors.map(neighbor => {
                         const neighborNode = nodes[neighbor.nodeId];
-                        const neighborName = neighborNode?.shortName || neighborNode?.longName || `!${neighbor.nodeId.toString(16)}`;
+                        const nShortName = neighborNode?.shortName || '';
+                        const nLongName = neighborNode?.longName || '';
+                        const nId = `!${neighbor.nodeId.toString(16)}`;
+                        const nDisplayName = nLongName || nShortName || nId;
+                        const nAvatarText = nShortName || nLongName?.substring(0, 4) || nId.substring(1, 5);
                         const snr = neighbor.snr !== undefined ? neighbor.snr : '--';
                         const snrClass = getSnrClass(neighbor.snr);
 
@@ -5060,9 +5075,9 @@ function renderNeighborLists() {
                             <li class="neighbor-item">
                                 <div class="neighbor-item-info">
                                     <div class="neighbor-item-avatar" style="background: ${getNodeColor(neighbor.nodeId)}">
-                                        ${neighborName.substring(0, 2).toUpperCase()}
+                                        ${nAvatarText.substring(0, 4).toUpperCase()}
                                     </div>
-                                    <span class="neighbor-item-name">${escapeHtml(neighborName)}</span>
+                                    <span class="neighbor-item-name">${escapeHtml(nDisplayName)}${nShortName && nLongName ? ` (${escapeHtml(nShortName)})` : ''}</span>
                                 </div>
                                 <div class="neighbor-item-snr">
                                     <div class="snr-bar">
@@ -5195,19 +5210,23 @@ function renderTopologyGraph() {
     nodeArray.forEach(nodeNum => {
         const pos = positions[nodeNum];
         const node = nodes[nodeNum];
-        const nodeName = node?.shortName || node?.longName || `!${nodeNum.toString(16)}`;
-        const displayName = nodeName.length > 8 ? nodeName.substring(0, 8) + '…' : nodeName;
+        const shortName = node?.shortName || '';
+        const longName = node?.longName || '';
+        const nodeId = `!${nodeNum.toString(16)}`;
+        const avatarText = shortName || longName?.substring(0, 4) || nodeId.substring(1, 5);
+        const displayName = longName || shortName || nodeId;
+        const truncatedName = displayName.length > 12 ? displayName.substring(0, 12) + '…' : displayName;
         const color = getNodeColor(nodeNum);
         const hasNeighborInfo = neighborInfoData[nodeNum] !== undefined;
 
         svgContent += `
             <g class="topology-node" transform="translate(${pos.x}, ${pos.y})">
                 <circle r="20" fill="${color}" stroke="${hasNeighborInfo ? 'var(--primary)' : 'var(--outline)'}" stroke-width="${hasNeighborInfo ? 3 : 1}"/>
-                <text y="5" text-anchor="middle" fill="white" font-size="11" font-weight="600">
-                    ${nodeName.substring(0, 2).toUpperCase()}
+                <text y="5" text-anchor="middle" fill="white" font-size="10" font-weight="600">
+                    ${avatarText.substring(0, 4).toUpperCase()}
                 </text>
                 <text y="38" text-anchor="middle" fill="var(--on-surface)" font-size="10">
-                    ${escapeHtml(displayName)}
+                    ${escapeHtml(truncatedName)}
                 </text>
             </g>
         `;
