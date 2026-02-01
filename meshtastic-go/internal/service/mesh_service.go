@@ -144,6 +144,11 @@ func (ms *MeshService) setupProcessorHandlers() {
 		ms.configManager.ProcessConfig(config)
 	})
 
+	// Handle module config updates
+	ms.processor.SetModuleConfigHandler(func(moduleConfig *pb.ModuleConfig) {
+		ms.configManager.ProcessModuleConfig(moduleConfig)
+	})
+
 	// Handle metadata updates
 	ms.processor.SetMetadataHandler(func(metadata *pb.DeviceMetadata) {
 		ms.configManager.ProcessMetadata(metadata)

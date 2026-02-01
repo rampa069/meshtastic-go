@@ -48,6 +48,9 @@ type NeighborInfoHandler func(from uint32, neighborInfo *pb.NeighborInfo)
 // WaypointHandler handles waypoint updates
 type WaypointHandler func(from uint32, waypoint *pb.Waypoint, viaMqtt bool)
 
+// ModuleConfigHandler handles module config updates
+type ModuleConfigHandler func(moduleConfig *pb.ModuleConfig)
+
 // Processor handles incoming radio packets
 type Processor struct {
 	mu sync.RWMutex
@@ -62,6 +65,7 @@ type Processor struct {
 	onTelemetry      TelemetryHandler
 	onChannel        ChannelHandler
 	onConfig         ConfigHandler
+	onModuleConfig   ModuleConfigHandler
 	onMetadata       MetadataHandler
 	onTraceroute     TracerouteHandler
 	onNeighborInfo   NeighborInfoHandler
@@ -141,6 +145,13 @@ func (p *Processor) SetConfigHandler(h ConfigHandler) {
 	p.onConfig = h
 }
 
+// SetModuleConfigHandler sets the module config handler
+func (p *Processor) SetModuleConfigHandler(h ModuleConfigHandler) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.onModuleConfig = h
+}
+
 // SetMetadataHandler sets the metadata handler
 func (p *Processor) SetMetadataHandler(h MetadataHandler) {
 	p.mu.Lock()
@@ -218,7 +229,9 @@ func (p *Processor) ProcessFromRadio(data []byte) error {
 		}
 
 	case *pb.FromRadio_ModuleConfig:
-		log.Debug().Msg("received module config")
+		if v.ModuleConfig != nil {
+			p.handleModuleConfig(v.ModuleConfig)
+		}
 
 	case *pb.FromRadio_Channel:
 		if v.Channel != nil {
@@ -606,6 +619,18 @@ func (p *Processor) handleConfig(config *pb.Config) {
 
 	if handler != nil {
 		handler(config)
+	}
+}
+
+func (p *Processor) handleModuleConfig(moduleConfig *pb.ModuleConfig) {
+	log.Debug().Msg("received module config")
+
+	p.mu.RLock()
+	handler := p.onModuleConfig
+	p.mu.RUnlock()
+
+	if handler != nil {
+		handler(moduleConfig)
 	}
 }
 

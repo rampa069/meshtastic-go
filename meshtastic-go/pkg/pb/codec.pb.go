@@ -1079,7 +1079,7 @@ func UnmarshalFromRadio(buf []byte) (*FromRadio, error) {
 			f.PayloadVariant = &FromRadio_Rebooted{Rebooted: v != 0}
 			offset += n
 
-		case 9: // module_config - skip for now
+		case 9: // module_config
 			if wireType != WireBytes {
 				offset = skipField(buf, offset, wireType)
 				continue
@@ -1089,6 +1089,13 @@ func UnmarshalFromRadio(buf []byte) (*FromRadio, error) {
 				return nil, ErrInvalidData
 			}
 			offset += n
+			if offset+int(length) > len(buf) {
+				return nil, ErrInvalidData
+			}
+			moduleConfig, err := UnmarshalModuleConfig(buf[offset : offset+int(length)])
+			if err == nil && moduleConfig != nil {
+				f.PayloadVariant = &FromRadio_ModuleConfig{ModuleConfig: moduleConfig}
+			}
 			offset += int(length)
 
 		case 10: // channel
@@ -3513,6 +3520,880 @@ func MarshalNeighborInfoConfig(nic *ModuleConfig_NeighborInfoConfig) ([]byte, er
 	}
 
 	return buf, nil
+}
+
+// UnmarshalModuleConfig decodes a ModuleConfig message from protobuf wire format.
+func UnmarshalModuleConfig(buf []byte) (*ModuleConfig, error) {
+	mc := &ModuleConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // mqtt
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			mqtt, err := UnmarshalMQTTConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_Mqtt{Mqtt: mqtt}
+			}
+			offset += int(length)
+
+		case 2: // serial
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			serial, err := UnmarshalSerialConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_Serial{Serial: serial}
+			}
+			offset += int(length)
+
+		case 3: // external_notification
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			extNotif, err := UnmarshalExternalNotificationConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_ExternalNotification{ExternalNotification: extNotif}
+			}
+			offset += int(length)
+
+		case 4: // store_forward
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			sf, err := UnmarshalStoreForwardConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_StoreForward{StoreForward: sf}
+			}
+			offset += int(length)
+
+		case 5: // range_test
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			rt, err := UnmarshalRangeTestConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_RangeTest{RangeTest: rt}
+			}
+			offset += int(length)
+
+		case 6: // telemetry
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			tel, err := UnmarshalTelemetryModuleConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_Telemetry{Telemetry: tel}
+			}
+			offset += int(length)
+
+		case 7: // canned_message
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			cm, err := UnmarshalCannedMessageConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_CannedMessage{CannedMessage: cm}
+			}
+			offset += int(length)
+
+		case 10: // neighbor_info
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			ni, err := UnmarshalNeighborInfoModuleConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				mc.PayloadVariant = &ModuleConfig_NeighborInfo{NeighborInfo: ni}
+			}
+			offset += int(length)
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return mc, nil
+}
+
+// UnmarshalMQTTConfig decodes an MQTTConfig from protobuf wire format.
+func UnmarshalMQTTConfig(buf []byte) (*ModuleConfig_MQTTConfig, error) {
+	mc := &ModuleConfig_MQTTConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			mc.Enabled = v != 0
+			offset += vn
+
+		case 2: // address
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			mc.Address = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 3: // username
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			mc.Username = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 4: // password
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			mc.Password = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 5: // encryption_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			mc.EncryptionEnabled = v != 0
+			offset += vn
+
+		case 6: // json_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			mc.JsonEnabled = v != 0
+			offset += vn
+
+		case 7: // tls_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			mc.TlsEnabled = v != 0
+			offset += vn
+
+		case 8: // root
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			mc.Root = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 9: // proxy_to_client_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			mc.ProxyToClientEnabled = v != 0
+			offset += vn
+
+		case 10: // map_reporting_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			mc.MapReportingEnabled = v != 0
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return mc, nil
+}
+
+// UnmarshalSerialConfig decodes a SerialConfig from protobuf wire format.
+func UnmarshalSerialConfig(buf []byte) (*ModuleConfig_SerialConfig, error) {
+	sc := &ModuleConfig_SerialConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.Enabled = v != 0
+			offset += vn
+
+		case 2: // echo
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.Echo = v != 0
+			offset += vn
+
+		case 3: // rxd
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.RxD = uint32(v)
+			offset += vn
+
+		case 4: // txd
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.TxD = uint32(v)
+			offset += vn
+
+		case 5: // baud
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.Baud = ModuleConfig_SerialConfig_Serial_Baud(v)
+			offset += vn
+
+		case 6: // timeout
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.Timeout = uint32(v)
+			offset += vn
+
+		case 7: // mode
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.Mode = uint32(v)
+			offset += vn
+
+		case 8: // override_console_serial_port
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sc.OverrideConsoleSerialPort = v != 0
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return sc, nil
+}
+
+// UnmarshalExternalNotificationConfig decodes an ExternalNotificationConfig from protobuf wire format.
+func UnmarshalExternalNotificationConfig(buf []byte) (*ModuleConfig_ExternalNotificationConfig, error) {
+	enc := &ModuleConfig_ExternalNotificationConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.Enabled = v != 0
+			offset += vn
+
+		case 2: // output_ms
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.OutputMs = uint32(v)
+			offset += vn
+
+		case 3: // output
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.Output = uint32(v)
+			offset += vn
+
+		case 4: // active
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.Active = v != 0
+			offset += vn
+
+		case 5: // alert_message
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.AlertMessage = v != 0
+			offset += vn
+
+		case 6: // alert_bell
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.AlertBell = v != 0
+			offset += vn
+
+		case 7: // use_pwm
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.UsePwm = v != 0
+			offset += vn
+
+		case 8: // output_vibra
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.OutputVibra = uint32(v)
+			offset += vn
+
+		case 9: // output_buzzer
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.OutputBuzzer = uint32(v)
+			offset += vn
+
+		case 14: // nag_timeout
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			enc.NagTimeout = uint32(v)
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return enc, nil
+}
+
+// UnmarshalStoreForwardConfig decodes a StoreForwardConfig from protobuf wire format.
+func UnmarshalStoreForwardConfig(buf []byte) (*ModuleConfig_StoreForwardConfig, error) {
+	sfc := &ModuleConfig_StoreForwardConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sfc.Enabled = v != 0
+			offset += vn
+
+		case 2: // heartbeat
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sfc.Heartbeat = v != 0
+			offset += vn
+
+		case 3: // records
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sfc.Records = uint32(v)
+			offset += vn
+
+		case 4: // history_return_max
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sfc.HistoryReturnMax = uint32(v)
+			offset += vn
+
+		case 5: // history_return_window
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			sfc.HistoryReturnWindow = uint32(v)
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return sfc, nil
+}
+
+// UnmarshalRangeTestConfig decodes a RangeTestConfig from protobuf wire format.
+func UnmarshalRangeTestConfig(buf []byte) (*ModuleConfig_RangeTestConfig, error) {
+	rtc := &ModuleConfig_RangeTestConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			rtc.Enabled = v != 0
+			offset += vn
+
+		case 2: // sender
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			rtc.Sender = uint32(v)
+			offset += vn
+
+		case 3: // save
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			rtc.Save = v != 0
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return rtc, nil
+}
+
+// UnmarshalTelemetryModuleConfig decodes a TelemetryConfig from protobuf wire format.
+func UnmarshalTelemetryModuleConfig(buf []byte) (*ModuleConfig_TelemetryConfig, error) {
+	tc := &ModuleConfig_TelemetryConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // device_update_interval
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.DeviceUpdateInterval = uint32(v)
+			offset += vn
+
+		case 2: // environment_update_interval
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.EnvironmentUpdateInterval = uint32(v)
+			offset += vn
+
+		case 3: // environment_measurement_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.EnvironmentMeasurementEnabled = v != 0
+			offset += vn
+
+		case 4: // environment_screen_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.EnvironmentScreenEnabled = v != 0
+			offset += vn
+
+		case 5: // environment_display_fahrenheit
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.EnvironmentDisplayFahrenheit = v != 0
+			offset += vn
+
+		case 6: // air_quality_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.AirQualityEnabled = v != 0
+			offset += vn
+
+		case 7: // air_quality_interval
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.AirQualityInterval = uint32(v)
+			offset += vn
+
+		case 8: // power_measurement_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.PowerMeasurementEnabled = v != 0
+			offset += vn
+
+		case 9: // power_update_interval
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.PowerUpdateInterval = uint32(v)
+			offset += vn
+
+		case 10: // power_screen_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			tc.PowerScreenEnabled = v != 0
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return tc, nil
+}
+
+// UnmarshalCannedMessageConfig decodes a CannedMessageConfig from protobuf wire format.
+func UnmarshalCannedMessageConfig(buf []byte) (*ModuleConfig_CannedMessageConfig, error) {
+	cmc := &ModuleConfig_CannedMessageConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // rotary_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.RotaryEnabled = v != 0
+			offset += vn
+
+		case 2: // inputbroker_pin_a
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.InputbrokerPinA = uint32(v)
+			offset += vn
+
+		case 3: // inputbroker_pin_b
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.InputbrokerPinB = uint32(v)
+			offset += vn
+
+		case 4: // inputbroker_pin_press
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.InputbrokerPinPress = uint32(v)
+			offset += vn
+
+		case 8: // upside_down
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.UpsideDown = v != 0
+			offset += vn
+
+		case 9: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.Enabled = v != 0
+			offset += vn
+
+		case 10: // allow_input_source
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			cmc.AllowInputSource = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 11: // send_bell
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			cmc.SendBell = v != 0
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return cmc, nil
+}
+
+// UnmarshalNeighborInfoModuleConfig decodes a NeighborInfoConfig from protobuf wire format.
+func UnmarshalNeighborInfoModuleConfig(buf []byte) (*ModuleConfig_NeighborInfoConfig, error) {
+	nic := &ModuleConfig_NeighborInfoConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			nic.Enabled = v != 0
+			offset += vn
+
+		case 2: // update_interval
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			nic.UpdateInterval = uint32(v)
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return nic, nil
 }
 
 // UnmarshalRouteDiscovery decodes a RouteDiscovery message from protobuf wire format.
