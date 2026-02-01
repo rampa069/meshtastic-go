@@ -760,6 +760,9 @@ func (s *Server) handleSetMQTTModule(c *gin.Context) {
 		return
 	}
 
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
+
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
@@ -784,6 +787,9 @@ func (s *Server) handleSetSerialModule(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
@@ -810,6 +816,9 @@ func (s *Server) handleSetTelemetryModule(c *gin.Context) {
 		return
 	}
 
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
+
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
@@ -834,6 +843,9 @@ func (s *Server) handleSetStoreForwardModule(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
@@ -860,6 +872,9 @@ func (s *Server) handleSetRangeTestModule(c *gin.Context) {
 		return
 	}
 
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
+
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
@@ -884,6 +899,9 @@ func (s *Server) handleSetCannedMessageModule(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
@@ -910,6 +928,9 @@ func (s *Server) handleSetNeighborInfoModule(c *gin.Context) {
 		return
 	}
 
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
+
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }
 
@@ -934,6 +955,9 @@ func (s *Server) handleSetExternalNotificationModule(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Update local config immediately so UI reflects the change
+	s.meshService.ConfigManager().ProcessModuleConfig(moduleConfig)
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "packetId": packetId})
 }

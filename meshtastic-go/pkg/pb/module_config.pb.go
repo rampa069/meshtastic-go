@@ -27,17 +27,17 @@ const (
 
 // MQTTConfig contains MQTT gateway settings.
 type ModuleConfig_MQTTConfig struct {
-	Enabled             bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Address             string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Username            string `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	Password            string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
-	EncryptionEnabled   bool   `protobuf:"varint,5,opt,name=encryption_enabled,json=encryptionEnabled,proto3" json:"encryption_enabled,omitempty"`
-	JsonEnabled         bool   `protobuf:"varint,6,opt,name=json_enabled,json=jsonEnabled,proto3" json:"json_enabled,omitempty"`
-	TlsEnabled          bool   `protobuf:"varint,7,opt,name=tls_enabled,json=tlsEnabled,proto3" json:"tls_enabled,omitempty"`
-	Root                string `protobuf:"bytes,8,opt,name=root,proto3" json:"root,omitempty"`
-	ProxyToClientEnabled bool  `protobuf:"varint,9,opt,name=proxy_to_client_enabled,json=proxyToClientEnabled,proto3" json:"proxy_to_client_enabled,omitempty"`
-	MapReportingEnabled bool   `protobuf:"varint,10,opt,name=map_reporting_enabled,json=mapReportingEnabled,proto3" json:"map_reporting_enabled,omitempty"`
-	MapReportSettings   *ModuleConfig_MapReportSettings `protobuf:"bytes,11,opt,name=map_report_settings,json=mapReportSettings,proto3" json:"map_report_settings,omitempty"`
+	Enabled              bool                            `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Address              string                          `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Username             string                          `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
+	Password             string                          `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	EncryptionEnabled    bool                            `protobuf:"varint,5,opt,name=encryption_enabled,json=encryptionEnabled,proto3" json:"encryptionEnabled,omitempty"`
+	JsonEnabled          bool                            `protobuf:"varint,6,opt,name=json_enabled,json=jsonEnabled,proto3" json:"jsonEnabled,omitempty"`
+	TlsEnabled           bool                            `protobuf:"varint,7,opt,name=tls_enabled,json=tlsEnabled,proto3" json:"tlsEnabled,omitempty"`
+	Root                 string                          `protobuf:"bytes,8,opt,name=root,proto3" json:"root,omitempty"`
+	ProxyToClientEnabled bool                            `protobuf:"varint,9,opt,name=proxy_to_client_enabled,json=proxyToClientEnabled,proto3" json:"proxyToClientEnabled,omitempty"`
+	MapReportingEnabled  bool                            `protobuf:"varint,10,opt,name=map_reporting_enabled,json=mapReportingEnabled,proto3" json:"mapReportingEnabled,omitempty"`
+	MapReportSettings    *ModuleConfig_MapReportSettings `protobuf:"bytes,11,opt,name=map_report_settings,json=mapReportSettings,proto3" json:"mapReportSettings,omitempty"`
 }
 
 func (m *ModuleConfig_MQTTConfig) Reset() { *m = ModuleConfig_MQTTConfig{} }
@@ -45,8 +45,8 @@ func (m *ModuleConfig_MQTTConfig) ProtoMessage() {}
 
 // MapReportSettings contains map reporting configuration.
 type ModuleConfig_MapReportSettings struct {
-	PublishIntervalSecs uint32 `protobuf:"varint,1,opt,name=publish_interval_secs,json=publishIntervalSecs,proto3" json:"publish_interval_secs,omitempty"`
-	PositionPrecision   uint32 `protobuf:"varint,2,opt,name=position_precision,json=positionPrecision,proto3" json:"position_precision,omitempty"`
+	PublishIntervalSecs uint32 `protobuf:"varint,1,opt,name=publish_interval_secs,json=publishIntervalSecs,proto3" json:"publishIntervalSecs,omitempty"`
+	PositionPrecision   uint32 `protobuf:"varint,2,opt,name=position_precision,json=positionPrecision,proto3" json:"positionPrecision,omitempty"`
 }
 
 func (m *ModuleConfig_MapReportSettings) Reset() { *m = ModuleConfig_MapReportSettings{} }
@@ -54,14 +54,14 @@ func (m *ModuleConfig_MapReportSettings) ProtoMessage() {}
 
 // SerialConfig contains serial module settings.
 type ModuleConfig_SerialConfig struct {
-	Enabled   bool                                  `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Echo      bool                                  `protobuf:"varint,2,opt,name=echo,proto3" json:"echo,omitempty"`
-	RxD       uint32                                `protobuf:"varint,3,opt,name=rxd,proto3" json:"rxd,omitempty"`
-	TxD       uint32                                `protobuf:"varint,4,opt,name=txd,proto3" json:"txd,omitempty"`
-	Baud      ModuleConfig_SerialConfig_Serial_Baud `protobuf:"varint,5,opt,name=baud,proto3,enum=meshtastic.ModuleConfig_SerialConfig_Serial_Baud" json:"baud,omitempty"`
-	Timeout   uint32                                `protobuf:"varint,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Mode      uint32                                `protobuf:"varint,7,opt,name=mode,proto3" json:"mode,omitempty"`
-	OverrideConsoleSerialPort bool                  `protobuf:"varint,8,opt,name=override_console_serial_port,json=overrideConsoleSerialPort,proto3" json:"override_console_serial_port,omitempty"`
+	Enabled                   bool                                  `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Echo                      bool                                  `protobuf:"varint,2,opt,name=echo,proto3" json:"echo,omitempty"`
+	RxD                       uint32                                `protobuf:"varint,3,opt,name=rxd,proto3" json:"rxd,omitempty"`
+	TxD                       uint32                                `protobuf:"varint,4,opt,name=txd,proto3" json:"txd,omitempty"`
+	Baud                      ModuleConfig_SerialConfig_Serial_Baud `protobuf:"varint,5,opt,name=baud,proto3,enum=meshtastic.ModuleConfig_SerialConfig_Serial_Baud" json:"baud,omitempty"`
+	Timeout                   uint32                                `protobuf:"varint,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Mode                      uint32                                `protobuf:"varint,7,opt,name=mode,proto3" json:"mode,omitempty"`
+	OverrideConsoleSerialPort bool                                  `protobuf:"varint,8,opt,name=override_console_serial_port,json=overrideConsoleSerialPort,proto3" json:"overrideConsoleSerialPort,omitempty"`
 }
 
 func (m *ModuleConfig_SerialConfig) Reset() { *m = ModuleConfig_SerialConfig{} }
@@ -69,21 +69,21 @@ func (m *ModuleConfig_SerialConfig) ProtoMessage() {}
 
 // ExternalNotificationConfig contains notification settings.
 type ModuleConfig_ExternalNotificationConfig struct {
-	Enabled                 bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	OutputMs                uint32 `protobuf:"varint,2,opt,name=output_ms,json=outputMs,proto3" json:"output_ms,omitempty"`
-	Output                  uint32 `protobuf:"varint,3,opt,name=output,proto3" json:"output,omitempty"`
-	OutputVibra             uint32 `protobuf:"varint,8,opt,name=output_vibra,json=outputVibra,proto3" json:"output_vibra,omitempty"`
-	OutputBuzzer            uint32 `protobuf:"varint,9,opt,name=output_buzzer,json=outputBuzzer,proto3" json:"output_buzzer,omitempty"`
-	Active                  bool   `protobuf:"varint,4,opt,name=active,proto3" json:"active,omitempty"`
-	AlertMessage            bool   `protobuf:"varint,5,opt,name=alert_message,json=alertMessage,proto3" json:"alert_message,omitempty"`
-	AlertMessageVibra       bool   `protobuf:"varint,10,opt,name=alert_message_vibra,json=alertMessageVibra,proto3" json:"alert_message_vibra,omitempty"`
-	AlertMessageBuzzer      bool   `protobuf:"varint,11,opt,name=alert_message_buzzer,json=alertMessageBuzzer,proto3" json:"alert_message_buzzer,omitempty"`
-	AlertBell               bool   `protobuf:"varint,6,opt,name=alert_bell,json=alertBell,proto3" json:"alert_bell,omitempty"`
-	AlertBellVibra          bool   `protobuf:"varint,12,opt,name=alert_bell_vibra,json=alertBellVibra,proto3" json:"alert_bell_vibra,omitempty"`
-	AlertBellBuzzer         bool   `protobuf:"varint,13,opt,name=alert_bell_buzzer,json=alertBellBuzzer,proto3" json:"alert_bell_buzzer,omitempty"`
-	UsePwm                  bool   `protobuf:"varint,7,opt,name=use_pwm,json=usePwm,proto3" json:"use_pwm,omitempty"`
-	NagTimeout              uint32 `protobuf:"varint,14,opt,name=nag_timeout,json=nagTimeout,proto3" json:"nag_timeout,omitempty"`
-	UseI2SAsBuzzer          bool   `protobuf:"varint,15,opt,name=use_i2s_as_buzzer,json=useI2sAsBuzzer,proto3" json:"use_i2s_as_buzzer,omitempty"`
+	Enabled            bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	OutputMs           uint32 `protobuf:"varint,2,opt,name=output_ms,json=outputMs,proto3" json:"outputMs,omitempty"`
+	Output             uint32 `protobuf:"varint,3,opt,name=output,proto3" json:"output,omitempty"`
+	OutputVibra        uint32 `protobuf:"varint,8,opt,name=output_vibra,json=outputVibra,proto3" json:"outputVibra,omitempty"`
+	OutputBuzzer       uint32 `protobuf:"varint,9,opt,name=output_buzzer,json=outputBuzzer,proto3" json:"outputBuzzer,omitempty"`
+	Active             bool   `protobuf:"varint,4,opt,name=active,proto3" json:"active,omitempty"`
+	AlertMessage       bool   `protobuf:"varint,5,opt,name=alert_message,json=alertMessage,proto3" json:"alertMessage,omitempty"`
+	AlertMessageVibra  bool   `protobuf:"varint,10,opt,name=alert_message_vibra,json=alertMessageVibra,proto3" json:"alertMessageVibra,omitempty"`
+	AlertMessageBuzzer bool   `protobuf:"varint,11,opt,name=alert_message_buzzer,json=alertMessageBuzzer,proto3" json:"alertMessageBuzzer,omitempty"`
+	AlertBell          bool   `protobuf:"varint,6,opt,name=alert_bell,json=alertBell,proto3" json:"alertBell,omitempty"`
+	AlertBellVibra     bool   `protobuf:"varint,12,opt,name=alert_bell_vibra,json=alertBellVibra,proto3" json:"alertBellVibra,omitempty"`
+	AlertBellBuzzer    bool   `protobuf:"varint,13,opt,name=alert_bell_buzzer,json=alertBellBuzzer,proto3" json:"alertBellBuzzer,omitempty"`
+	UsePwm             bool   `protobuf:"varint,7,opt,name=use_pwm,json=usePwm,proto3" json:"usePwm,omitempty"`
+	NagTimeout         uint32 `protobuf:"varint,14,opt,name=nag_timeout,json=nagTimeout,proto3" json:"nagTimeout,omitempty"`
+	UseI2SAsBuzzer     bool   `protobuf:"varint,15,opt,name=use_i2s_as_buzzer,json=useI2sAsBuzzer,proto3" json:"useI2sAsBuzzer,omitempty"`
 }
 
 func (m *ModuleConfig_ExternalNotificationConfig) Reset() { *m = ModuleConfig_ExternalNotificationConfig{} }
@@ -91,11 +91,11 @@ func (m *ModuleConfig_ExternalNotificationConfig) ProtoMessage() {}
 
 // StoreForwardConfig contains store and forward settings.
 type ModuleConfig_StoreForwardConfig struct {
-	Enabled      bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Heartbeat    bool   `protobuf:"varint,2,opt,name=heartbeat,proto3" json:"heartbeat,omitempty"`
-	Records      uint32 `protobuf:"varint,3,opt,name=records,proto3" json:"records,omitempty"`
-	HistoryReturnMax uint32 `protobuf:"varint,4,opt,name=history_return_max,json=historyReturnMax,proto3" json:"history_return_max,omitempty"`
-	HistoryReturnWindow uint32 `protobuf:"varint,5,opt,name=history_return_window,json=historyReturnWindow,proto3" json:"history_return_window,omitempty"`
+	Enabled             bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Heartbeat           bool   `protobuf:"varint,2,opt,name=heartbeat,proto3" json:"heartbeat,omitempty"`
+	Records             uint32 `protobuf:"varint,3,opt,name=records,proto3" json:"records,omitempty"`
+	HistoryReturnMax    uint32 `protobuf:"varint,4,opt,name=history_return_max,json=historyReturnMax,proto3" json:"historyReturnMax,omitempty"`
+	HistoryReturnWindow uint32 `protobuf:"varint,5,opt,name=history_return_window,json=historyReturnWindow,proto3" json:"historyReturnWindow,omitempty"`
 }
 
 func (m *ModuleConfig_StoreForwardConfig) Reset() { *m = ModuleConfig_StoreForwardConfig{} }
@@ -113,19 +113,19 @@ func (m *ModuleConfig_RangeTestConfig) ProtoMessage() {}
 
 // TelemetryConfig contains telemetry module settings.
 type ModuleConfig_TelemetryConfig struct {
-	DeviceUpdateInterval      uint32 `protobuf:"varint,1,opt,name=device_update_interval,json=deviceUpdateInterval,proto3" json:"device_update_interval,omitempty"`
-	EnvironmentUpdateInterval uint32 `protobuf:"varint,2,opt,name=environment_update_interval,json=environmentUpdateInterval,proto3" json:"environment_update_interval,omitempty"`
-	EnvironmentMeasurementEnabled bool `protobuf:"varint,3,opt,name=environment_measurement_enabled,json=environmentMeasurementEnabled,proto3" json:"environment_measurement_enabled,omitempty"`
-	EnvironmentScreenEnabled  bool   `protobuf:"varint,4,opt,name=environment_screen_enabled,json=environmentScreenEnabled,proto3" json:"environment_screen_enabled,omitempty"`
-	EnvironmentDisplayFahrenheit bool `protobuf:"varint,5,opt,name=environment_display_fahrenheit,json=environmentDisplayFahrenheit,proto3" json:"environment_display_fahrenheit,omitempty"`
-	AirQualityEnabled         bool   `protobuf:"varint,6,opt,name=air_quality_enabled,json=airQualityEnabled,proto3" json:"air_quality_enabled,omitempty"`
-	AirQualityInterval        uint32 `protobuf:"varint,7,opt,name=air_quality_interval,json=airQualityInterval,proto3" json:"air_quality_interval,omitempty"`
-	PowerMeasurementEnabled   bool   `protobuf:"varint,8,opt,name=power_measurement_enabled,json=powerMeasurementEnabled,proto3" json:"power_measurement_enabled,omitempty"`
-	PowerUpdateInterval       uint32 `protobuf:"varint,9,opt,name=power_update_interval,json=powerUpdateInterval,proto3" json:"power_update_interval,omitempty"`
-	PowerScreenEnabled        bool   `protobuf:"varint,10,opt,name=power_screen_enabled,json=powerScreenEnabled,proto3" json:"power_screen_enabled,omitempty"`
-	HealthMeasurementEnabled  bool   `protobuf:"varint,11,opt,name=health_measurement_enabled,json=healthMeasurementEnabled,proto3" json:"health_measurement_enabled,omitempty"`
-	HealthUpdateInterval      uint32 `protobuf:"varint,12,opt,name=health_update_interval,json=healthUpdateInterval,proto3" json:"health_update_interval,omitempty"`
-	HealthScreenEnabled       bool   `protobuf:"varint,13,opt,name=health_screen_enabled,json=healthScreenEnabled,proto3" json:"health_screen_enabled,omitempty"`
+	DeviceUpdateInterval          uint32 `protobuf:"varint,1,opt,name=device_update_interval,json=deviceUpdateInterval,proto3" json:"deviceUpdateInterval,omitempty"`
+	EnvironmentUpdateInterval     uint32 `protobuf:"varint,2,opt,name=environment_update_interval,json=environmentUpdateInterval,proto3" json:"environmentUpdateInterval,omitempty"`
+	EnvironmentMeasurementEnabled bool   `protobuf:"varint,3,opt,name=environment_measurement_enabled,json=environmentMeasurementEnabled,proto3" json:"environmentMeasurementEnabled,omitempty"`
+	EnvironmentScreenEnabled      bool   `protobuf:"varint,4,opt,name=environment_screen_enabled,json=environmentScreenEnabled,proto3" json:"environmentScreenEnabled,omitempty"`
+	EnvironmentDisplayFahrenheit  bool   `protobuf:"varint,5,opt,name=environment_display_fahrenheit,json=environmentDisplayFahrenheit,proto3" json:"environmentDisplayFahrenheit,omitempty"`
+	AirQualityEnabled             bool   `protobuf:"varint,6,opt,name=air_quality_enabled,json=airQualityEnabled,proto3" json:"airQualityEnabled,omitempty"`
+	AirQualityInterval            uint32 `protobuf:"varint,7,opt,name=air_quality_interval,json=airQualityInterval,proto3" json:"airQualityInterval,omitempty"`
+	PowerMeasurementEnabled       bool   `protobuf:"varint,8,opt,name=power_measurement_enabled,json=powerMeasurementEnabled,proto3" json:"powerMeasurementEnabled,omitempty"`
+	PowerUpdateInterval           uint32 `protobuf:"varint,9,opt,name=power_update_interval,json=powerUpdateInterval,proto3" json:"powerUpdateInterval,omitempty"`
+	PowerScreenEnabled            bool   `protobuf:"varint,10,opt,name=power_screen_enabled,json=powerScreenEnabled,proto3" json:"powerScreenEnabled,omitempty"`
+	HealthMeasurementEnabled      bool   `protobuf:"varint,11,opt,name=health_measurement_enabled,json=healthMeasurementEnabled,proto3" json:"healthMeasurementEnabled,omitempty"`
+	HealthUpdateInterval          uint32 `protobuf:"varint,12,opt,name=health_update_interval,json=healthUpdateInterval,proto3" json:"healthUpdateInterval,omitempty"`
+	HealthScreenEnabled           bool   `protobuf:"varint,13,opt,name=health_screen_enabled,json=healthScreenEnabled,proto3" json:"healthScreenEnabled,omitempty"`
 }
 
 func (m *ModuleConfig_TelemetryConfig) Reset() { *m = ModuleConfig_TelemetryConfig{} }
@@ -133,17 +133,17 @@ func (m *ModuleConfig_TelemetryConfig) ProtoMessage() {}
 
 // CannedMessageConfig contains canned message settings.
 type ModuleConfig_CannedMessageConfig struct {
-	RotaryEnabled        bool   `protobuf:"varint,1,opt,name=rotary_enabled,json=rotaryEnabled,proto3" json:"rotary_enabled,omitempty"`
-	InputbrokerPinA      uint32 `protobuf:"varint,2,opt,name=inputbroker_pin_a,json=inputbrokerPinA,proto3" json:"inputbroker_pin_a,omitempty"`
-	InputbrokerPinB      uint32 `protobuf:"varint,3,opt,name=inputbroker_pin_b,json=inputbrokerPinB,proto3" json:"inputbroker_pin_b,omitempty"`
-	InputbrokerPinPress  uint32 `protobuf:"varint,4,opt,name=inputbroker_pin_press,json=inputbrokerPinPress,proto3" json:"inputbroker_pin_press,omitempty"`
-	InputbrokerEventCw   uint32 `protobuf:"varint,5,opt,name=inputbroker_event_cw,json=inputbrokerEventCw,proto3" json:"inputbroker_event_cw,omitempty"`
-	InputbrokerEventCcw  uint32 `protobuf:"varint,6,opt,name=inputbroker_event_ccw,json=inputbrokerEventCcw,proto3" json:"inputbroker_event_ccw,omitempty"`
-	InputbrokerEventPress uint32 `protobuf:"varint,7,opt,name=inputbroker_event_press,json=inputbrokerEventPress,proto3" json:"inputbroker_event_press,omitempty"`
-	UpsideDown           bool   `protobuf:"varint,8,opt,name=upside_down,json=upsideDown,proto3" json:"upside_down,omitempty"`
-	Enabled              bool   `protobuf:"varint,9,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	AllowInputSource     string `protobuf:"bytes,10,opt,name=allow_input_source,json=allowInputSource,proto3" json:"allow_input_source,omitempty"`
-	SendBell             bool   `protobuf:"varint,11,opt,name=send_bell,json=sendBell,proto3" json:"send_bell,omitempty"`
+	RotaryEnabled         bool   `protobuf:"varint,1,opt,name=rotary_enabled,json=rotaryEnabled,proto3" json:"rotaryEnabled,omitempty"`
+	InputbrokerPinA       uint32 `protobuf:"varint,2,opt,name=inputbroker_pin_a,json=inputbrokerPinA,proto3" json:"inputbrokerPinA,omitempty"`
+	InputbrokerPinB       uint32 `protobuf:"varint,3,opt,name=inputbroker_pin_b,json=inputbrokerPinB,proto3" json:"inputbrokerPinB,omitempty"`
+	InputbrokerPinPress   uint32 `protobuf:"varint,4,opt,name=inputbroker_pin_press,json=inputbrokerPinPress,proto3" json:"inputbrokerPinPress,omitempty"`
+	InputbrokerEventCw    uint32 `protobuf:"varint,5,opt,name=inputbroker_event_cw,json=inputbrokerEventCw,proto3" json:"inputbrokerEventCw,omitempty"`
+	InputbrokerEventCcw   uint32 `protobuf:"varint,6,opt,name=inputbroker_event_ccw,json=inputbrokerEventCcw,proto3" json:"inputbrokerEventCcw,omitempty"`
+	InputbrokerEventPress uint32 `protobuf:"varint,7,opt,name=inputbroker_event_press,json=inputbrokerEventPress,proto3" json:"inputbrokerEventPress,omitempty"`
+	UpsideDown            bool   `protobuf:"varint,8,opt,name=upside_down,json=upsideDown,proto3" json:"upsideDown,omitempty"`
+	Enabled               bool   `protobuf:"varint,9,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	AllowInputSource      string `protobuf:"bytes,10,opt,name=allow_input_source,json=allowInputSource,proto3" json:"allowInputSource,omitempty"`
+	SendBell              bool   `protobuf:"varint,11,opt,name=send_bell,json=sendBell,proto3" json:"sendBell,omitempty"`
 }
 
 func (m *ModuleConfig_CannedMessageConfig) Reset() { *m = ModuleConfig_CannedMessageConfig{} }
@@ -151,13 +151,13 @@ func (m *ModuleConfig_CannedMessageConfig) ProtoMessage() {}
 
 // AudioConfig contains audio module settings.
 type ModuleConfig_AudioConfig struct {
-	Codec2Enabled   bool   `protobuf:"varint,1,opt,name=codec2_enabled,json=codec2Enabled,proto3" json:"codec2_enabled,omitempty"`
-	PttPin          uint32 `protobuf:"varint,2,opt,name=ptt_pin,json=pttPin,proto3" json:"ptt_pin,omitempty"`
-	Bitrate         uint32 `protobuf:"varint,3,opt,name=bitrate,proto3" json:"bitrate,omitempty"`
-	I2sWs           uint32 `protobuf:"varint,4,opt,name=i2s_ws,json=i2sWs,proto3" json:"i2s_ws,omitempty"`
-	I2sSd           uint32 `protobuf:"varint,5,opt,name=i2s_sd,json=i2sSd,proto3" json:"i2s_sd,omitempty"`
-	I2sDin          uint32 `protobuf:"varint,6,opt,name=i2s_din,json=i2sDin,proto3" json:"i2s_din,omitempty"`
-	I2sSck          uint32 `protobuf:"varint,7,opt,name=i2s_sck,json=i2sSck,proto3" json:"i2s_sck,omitempty"`
+	Codec2Enabled bool   `protobuf:"varint,1,opt,name=codec2_enabled,json=codec2Enabled,proto3" json:"codec2Enabled,omitempty"`
+	PttPin        uint32 `protobuf:"varint,2,opt,name=ptt_pin,json=pttPin,proto3" json:"pttPin,omitempty"`
+	Bitrate       uint32 `protobuf:"varint,3,opt,name=bitrate,proto3" json:"bitrate,omitempty"`
+	I2sWs         uint32 `protobuf:"varint,4,opt,name=i2s_ws,json=i2sWs,proto3" json:"i2sWs,omitempty"`
+	I2sSd         uint32 `protobuf:"varint,5,opt,name=i2s_sd,json=i2sSd,proto3" json:"i2sSd,omitempty"`
+	I2sDin        uint32 `protobuf:"varint,6,opt,name=i2s_din,json=i2sDin,proto3" json:"i2sDin,omitempty"`
+	I2sSck        uint32 `protobuf:"varint,7,opt,name=i2s_sck,json=i2sSck,proto3" json:"i2sSck,omitempty"`
 }
 
 func (m *ModuleConfig_AudioConfig) Reset() { *m = ModuleConfig_AudioConfig{} }
@@ -165,9 +165,9 @@ func (m *ModuleConfig_AudioConfig) ProtoMessage() {}
 
 // RemoteHardwareConfig contains remote hardware settings.
 type ModuleConfig_RemoteHardwareConfig struct {
-	Enabled              bool                     `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	AllowUndefinedPinAccess bool                  `protobuf:"varint,2,opt,name=allow_undefined_pin_access,json=allowUndefinedPinAccess,proto3" json:"allow_undefined_pin_access,omitempty"`
-	AvailablePins        []*RemoteHardwarePin     `protobuf:"bytes,3,rep,name=available_pins,json=availablePins,proto3" json:"available_pins,omitempty"`
+	Enabled                 bool                 `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	AllowUndefinedPinAccess bool                 `protobuf:"varint,2,opt,name=allow_undefined_pin_access,json=allowUndefinedPinAccess,proto3" json:"allowUndefinedPinAccess,omitempty"`
+	AvailablePins           []*RemoteHardwarePin `protobuf:"bytes,3,rep,name=available_pins,json=availablePins,proto3" json:"availablePins,omitempty"`
 }
 
 func (m *ModuleConfig_RemoteHardwareConfig) Reset() { *m = ModuleConfig_RemoteHardwareConfig{} }
@@ -175,7 +175,7 @@ func (m *ModuleConfig_RemoteHardwareConfig) ProtoMessage() {}
 
 // RemoteHardwarePin defines a remote hardware GPIO pin.
 type RemoteHardwarePin struct {
-	GpioPin uint32 `protobuf:"varint,1,opt,name=gpio_pin,json=gpioPin,proto3" json:"gpio_pin,omitempty"`
+	GpioPin uint32 `protobuf:"varint,1,opt,name=gpio_pin,json=gpioPin,proto3" json:"gpioPin,omitempty"`
 	Name    string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Type    uint32 `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`
 }
@@ -185,8 +185,8 @@ func (r *RemoteHardwarePin) ProtoMessage() {}
 
 // NeighborInfoConfig contains neighbor info module settings.
 type ModuleConfig_NeighborInfoConfig struct {
-	Enabled    bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	UpdateInterval uint32 `protobuf:"varint,2,opt,name=update_interval,json=updateInterval,proto3" json:"update_interval,omitempty"`
+	Enabled        bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	UpdateInterval uint32 `protobuf:"varint,2,opt,name=update_interval,json=updateInterval,proto3" json:"updateInterval,omitempty"`
 }
 
 func (m *ModuleConfig_NeighborInfoConfig) Reset() { *m = ModuleConfig_NeighborInfoConfig{} }
@@ -194,14 +194,14 @@ func (m *ModuleConfig_NeighborInfoConfig) ProtoMessage() {}
 
 // DetectionSensorConfig contains detection sensor settings.
 type ModuleConfig_DetectionSensorConfig struct {
-	Enabled                  bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	MinimumBroadcastSecs     uint32 `protobuf:"varint,2,opt,name=minimum_broadcast_secs,json=minimumBroadcastSecs,proto3" json:"minimum_broadcast_secs,omitempty"`
-	StateBroadcastSecs       uint32 `protobuf:"varint,3,opt,name=state_broadcast_secs,json=stateBroadcastSecs,proto3" json:"state_broadcast_secs,omitempty"`
-	SendBell                 bool   `protobuf:"varint,4,opt,name=send_bell,json=sendBell,proto3" json:"send_bell,omitempty"`
-	Name                     string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
-	MonitorPin               uint32 `protobuf:"varint,6,opt,name=monitor_pin,json=monitorPin,proto3" json:"monitor_pin,omitempty"`
-	DetectionTriggeredHigh   bool   `protobuf:"varint,7,opt,name=detection_triggered_high,json=detectionTriggeredHigh,proto3" json:"detection_triggered_high,omitempty"`
-	UsePullup                bool   `protobuf:"varint,8,opt,name=use_pullup,json=usePullup,proto3" json:"use_pullup,omitempty"`
+	Enabled                bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	MinimumBroadcastSecs   uint32 `protobuf:"varint,2,opt,name=minimum_broadcast_secs,json=minimumBroadcastSecs,proto3" json:"minimumBroadcastSecs,omitempty"`
+	StateBroadcastSecs     uint32 `protobuf:"varint,3,opt,name=state_broadcast_secs,json=stateBroadcastSecs,proto3" json:"stateBroadcastSecs,omitempty"`
+	SendBell               bool   `protobuf:"varint,4,opt,name=send_bell,json=sendBell,proto3" json:"sendBell,omitempty"`
+	Name                   string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	MonitorPin             uint32 `protobuf:"varint,6,opt,name=monitor_pin,json=monitorPin,proto3" json:"monitorPin,omitempty"`
+	DetectionTriggeredHigh bool   `protobuf:"varint,7,opt,name=detection_triggered_high,json=detectionTriggeredHigh,proto3" json:"detectionTriggeredHigh,omitempty"`
+	UsePullup              bool   `protobuf:"varint,8,opt,name=use_pullup,json=usePullup,proto3" json:"usePullup,omitempty"`
 }
 
 func (m *ModuleConfig_DetectionSensorConfig) Reset() { *m = ModuleConfig_DetectionSensorConfig{} }
@@ -209,8 +209,8 @@ func (m *ModuleConfig_DetectionSensorConfig) ProtoMessage() {}
 
 // PaxcounterConfig contains pax counter settings.
 type ModuleConfig_PaxcounterConfig struct {
-	Enabled         bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	PaxcounterUpdateInterval uint32 `protobuf:"varint,2,opt,name=paxcounter_update_interval,json=paxcounterUpdateInterval,proto3" json:"paxcounter_update_interval,omitempty"`
+	Enabled                  bool   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	PaxcounterUpdateInterval uint32 `protobuf:"varint,2,opt,name=paxcounter_update_interval,json=paxcounterUpdateInterval,proto3" json:"paxcounterUpdateInterval,omitempty"`
 }
 
 func (m *ModuleConfig_PaxcounterConfig) Reset() { *m = ModuleConfig_PaxcounterConfig{} }
@@ -218,7 +218,7 @@ func (m *ModuleConfig_PaxcounterConfig) ProtoMessage() {}
 
 // AmbientLightingConfig contains ambient lighting settings.
 type ModuleConfig_AmbientLightingConfig struct {
-	LedState bool   `protobuf:"varint,1,opt,name=led_state,json=ledState,proto3" json:"led_state,omitempty"`
+	LedState bool   `protobuf:"varint,1,opt,name=led_state,json=ledState,proto3" json:"ledState,omitempty"`
 	Current  uint32 `protobuf:"varint,2,opt,name=current,proto3" json:"current,omitempty"`
 	Red      uint32 `protobuf:"varint,3,opt,name=red,proto3" json:"red,omitempty"`
 	Green    uint32 `protobuf:"varint,4,opt,name=green,proto3" json:"green,omitempty"`
