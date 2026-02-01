@@ -1,0 +1,31 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  cors:
+    enabled: true
+    allowed_origins:
+      - "*"
+
+database:
+  path: "./meshtastic.db"
+
+radio:
+  auto_connect: false
+  connection_type: ""  # ble, serial, or tcp
+  address: ""          # device address (e.g., /dev/ttyUSB0, 192.168.1.100:4403)
+  heartbeat_secs: 30
+  reconnect_delay_secs: 5
+
+mqtt:
+  enabled: false
+  server: "mqtt.meshtastic.org"
+  port: 1883
+  username: ""
+  password: ""
+  root_topic: "msh/2/e/"
+  json_topic: "msh/2/json/"
+
+logging:
+  level: "info"    # debug, info, warn, error
+  format: "text"   # text or json
+  file: ""         # optional log file path

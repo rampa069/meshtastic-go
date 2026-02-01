@@ -1,0 +1,26 @@
+# Binaries
+meshtastic
+meshtastic-go
+bin/
+*.exe
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+
+# Logs
+*.log
