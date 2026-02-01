@@ -3865,9 +3865,21 @@ async function requestTelemetry() {
 
     try {
         await api('POST', `/nodes/${selectedNode.num}/request-telemetry`);
-        showToast('Telemetry requested', 'Waiting for power/environment data...');
+        showToast('Telemetry requested', 'Waiting for device/environment/stats data...');
     } catch (e) {
         console.error('Request telemetry failed:', e);
+        showToast('Error', e.message, 'error');
+    }
+}
+
+async function requestNeighborInfo() {
+    if (!selectedNode) return;
+
+    try {
+        await api('POST', `/nodes/${selectedNode.num}/request-neighbor-info`);
+        showToast('Neighbor info requested', 'Waiting for neighbor list...');
+    } catch (e) {
+        console.error('Request neighbor info failed:', e);
         showToast('Error', e.message, 'error');
     }
 }

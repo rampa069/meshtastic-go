@@ -35,6 +35,7 @@ const (
 	HardwareModel_WIO_WM1110               HardwareModel = 21
 	HardwareModel_RAK2560                  HardwareModel = 22
 	HardwareModel_HELTEC_HRU_3601          HardwareModel = 23
+	HardwareModel_HELTEC_WIRELESS_BRIDGE   HardwareModel = 24
 	HardwareModel_STATION_G1               HardwareModel = 25
 	HardwareModel_RAK11310                 HardwareModel = 26
 	HardwareModel_SENSELORA_RP2040         HardwareModel = 27
@@ -89,6 +90,51 @@ const (
 	HardwareModel_RP2040_FEATHER_RFM95     HardwareModel = 76
 	HardwareModel_M5STACK_COREBASIC        HardwareModel = 77
 	HardwareModel_M5STACK_CORE2            HardwareModel = 78
+	HardwareModel_RPI_PICO2                HardwareModel = 79
+	HardwareModel_M5STACK_CORES3           HardwareModel = 80
+	HardwareModel_SEEED_XIAO_S3            HardwareModel = 81
+	HardwareModel_MS24SF1                  HardwareModel = 82
+	HardwareModel_TLORA_C6                 HardwareModel = 83
+	HardwareModel_WISMESH_TAP              HardwareModel = 84
+	HardwareModel_ROUTASTIC                HardwareModel = 85
+	HardwareModel_MESH_TAB                 HardwareModel = 86
+	HardwareModel_MESHLINK                 HardwareModel = 87
+	HardwareModel_XIAO_NRF52_KIT           HardwareModel = 88
+	HardwareModel_THINKNODE_M1             HardwareModel = 89
+	HardwareModel_THINKNODE_M2             HardwareModel = 90
+	HardwareModel_T_ETH_ELITE              HardwareModel = 91
+	HardwareModel_HELTEC_SENSOR_HUB        HardwareModel = 92
+	HardwareModel_MUZI_BASE                HardwareModel = 93
+	HardwareModel_HELTEC_MESH_POCKET       HardwareModel = 94
+	HardwareModel_SEEED_SOLAR_NODE         HardwareModel = 95
+	HardwareModel_NOMADSTAR_METEOR_PRO     HardwareModel = 96
+	HardwareModel_CROWPANEL                HardwareModel = 97
+	HardwareModel_LINK_32                  HardwareModel = 98
+	HardwareModel_SEEED_WIO_TRACKER_L1     HardwareModel = 99
+	HardwareModel_SEEED_WIO_TRACKER_L1_EINK HardwareModel = 100
+	HardwareModel_MUZI_R1_NEO              HardwareModel = 101
+	HardwareModel_T_DECK_PRO               HardwareModel = 102
+	HardwareModel_T_LORA_PAGER             HardwareModel = 103
+	HardwareModel_M5STACK_RESERVED         HardwareModel = 104
+	HardwareModel_WISMESH_TAG              HardwareModel = 105
+	HardwareModel_RAK3312                  HardwareModel = 106
+	HardwareModel_THINKNODE_M5             HardwareModel = 107
+	HardwareModel_HELTEC_MESH_SOLAR        HardwareModel = 108
+	HardwareModel_T_ECHO_LITE              HardwareModel = 109
+	HardwareModel_HELTEC_V4                HardwareModel = 110
+	HardwareModel_M5STACK_C6L              HardwareModel = 111
+	HardwareModel_M5STACK_CARDPUTER_ADV    HardwareModel = 112
+	HardwareModel_HELTEC_WIRELESS_TRACKER_V2 HardwareModel = 113
+	HardwareModel_T_WATCH_ULTRA            HardwareModel = 114
+	HardwareModel_THINKNODE_M3             HardwareModel = 115
+	HardwareModel_WISMESH_TAP_V2           HardwareModel = 116
+	HardwareModel_RAK3401                  HardwareModel = 117
+	HardwareModel_RAK6421                  HardwareModel = 118
+	HardwareModel_THINKNODE_M4             HardwareModel = 119
+	HardwareModel_THINKNODE_M6             HardwareModel = 120
+	HardwareModel_MESHSTICK_1262           HardwareModel = 121
+	HardwareModel_TBEAM_1_WATT             HardwareModel = 122
+	HardwareModel_T5_S3_EPAPER_PRO         HardwareModel = 123
 	HardwareModel_PRIVATE_HW               HardwareModel = 255
 )
 
@@ -117,6 +163,7 @@ var HardwareModel_name = map[int32]string{
 	21:  "WIO_WM1110",
 	22:  "RAK2560",
 	23:  "HELTEC_HRU_3601",
+	24:  "HELTEC_WIRELESS_BRIDGE",
 	25:  "STATION_G1",
 	26:  "RAK11310",
 	27:  "SENSELORA_RP2040",
@@ -171,6 +218,51 @@ var HardwareModel_name = map[int32]string{
 	76:  "RP2040_FEATHER_RFM95",
 	77:  "M5STACK_COREBASIC",
 	78:  "M5STACK_CORE2",
+	79:  "RPI_PICO2",
+	80:  "M5STACK_CORES3",
+	81:  "SEEED_XIAO_S3",
+	82:  "MS24SF1",
+	83:  "TLORA_C6",
+	84:  "WISMESH_TAP",
+	85:  "ROUTASTIC",
+	86:  "MESH_TAB",
+	87:  "MESHLINK",
+	88:  "XIAO_NRF52_KIT",
+	89:  "THINKNODE_M1",
+	90:  "THINKNODE_M2",
+	91:  "T_ETH_ELITE",
+	92:  "HELTEC_SENSOR_HUB",
+	93:  "MUZI_BASE",
+	94:  "HELTEC_MESH_POCKET",
+	95:  "SEEED_SOLAR_NODE",
+	96:  "NOMADSTAR_METEOR_PRO",
+	97:  "CROWPANEL",
+	98:  "LINK_32",
+	99:  "SEEED_WIO_TRACKER_L1",
+	100: "SEEED_WIO_TRACKER_L1_EINK",
+	101: "MUZI_R1_NEO",
+	102: "T_DECK_PRO",
+	103: "T_LORA_PAGER",
+	104: "M5STACK_RESERVED",
+	105: "WISMESH_TAG",
+	106: "RAK3312",
+	107: "THINKNODE_M5",
+	108: "HELTEC_MESH_SOLAR",
+	109: "T_ECHO_LITE",
+	110: "HELTEC_V4",
+	111: "M5STACK_C6L",
+	112: "M5STACK_CARDPUTER_ADV",
+	113: "HELTEC_WIRELESS_TRACKER_V2",
+	114: "T_WATCH_ULTRA",
+	115: "THINKNODE_M3",
+	116: "WISMESH_TAP_V2",
+	117: "RAK3401",
+	118: "RAK6421",
+	119: "THINKNODE_M4",
+	120: "THINKNODE_M6",
+	121: "MESHSTICK_1262",
+	122: "TBEAM_1_WATT",
+	123: "T5_S3_EPAPER_PRO",
 	255: "PRIVATE_HW",
 }
 

@@ -226,3 +226,20 @@ func (h *NodeHandler) RequestTelemetry(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "requestId": packetId})
 }
+
+// RequestNeighborInfo requests neighbor info from a remote node
+func (h *NodeHandler) RequestNeighborInfo(c *gin.Context) {
+	nodeNum, err := strconv.ParseUint(c.Param("nodeNum"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid node number"})
+		return
+	}
+
+	packetId, err := h.meshService.RequestNeighborInfo(uint32(nodeNum))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "requestId": packetId})
+}

@@ -396,6 +396,14 @@ func (ms *MeshService) RequestTelemetry(destNode uint32) (uint32, error) {
 	return ms.sender.RequestTelemetry(destNode)
 }
 
+// RequestNeighborInfo requests neighbor info from a remote node
+func (ms *MeshService) RequestNeighborInfo(destNode uint32) (uint32, error) {
+	if ms.sender == nil {
+		return 0, fmt.Errorf("not connected")
+	}
+	return ms.sender.RequestNeighborInfo(destNode)
+}
+
 // SendWaypoint sends a waypoint to the mesh
 func (ms *MeshService) SendWaypoint(waypoint *pb.Waypoint, channel uint32) error {
 	if ms.sender == nil {

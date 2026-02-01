@@ -1478,6 +1478,13 @@ func UnmarshalConfig(buf []byte) (*Config, error) {
 				return nil, ErrInvalidData
 			}
 			offset += ln
+			if offset+int(length) > len(buf) {
+				return nil, ErrInvalidData
+			}
+			power, err := UnmarshalPowerConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				c.PayloadVariant = &Config_Power{Power: power}
+			}
 			offset += int(length)
 
 		case 4: // network
@@ -1490,6 +1497,13 @@ func UnmarshalConfig(buf []byte) (*Config, error) {
 				return nil, ErrInvalidData
 			}
 			offset += ln
+			if offset+int(length) > len(buf) {
+				return nil, ErrInvalidData
+			}
+			network, err := UnmarshalNetworkConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				c.PayloadVariant = &Config_Network{Network: network}
+			}
 			offset += int(length)
 
 		case 5: // display
@@ -1502,6 +1516,13 @@ func UnmarshalConfig(buf []byte) (*Config, error) {
 				return nil, ErrInvalidData
 			}
 			offset += ln
+			if offset+int(length) > len(buf) {
+				return nil, ErrInvalidData
+			}
+			display, err := UnmarshalDisplayConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				c.PayloadVariant = &Config_Display{Display: display}
+			}
 			offset += int(length)
 
 		case 6: // lora
@@ -1533,6 +1554,13 @@ func UnmarshalConfig(buf []byte) (*Config, error) {
 				return nil, ErrInvalidData
 			}
 			offset += ln
+			if offset+int(length) > len(buf) {
+				return nil, ErrInvalidData
+			}
+			bluetooth, err := UnmarshalBluetoothConfig(buf[offset : offset+int(length)])
+			if err == nil {
+				c.PayloadVariant = &Config_Bluetooth{Bluetooth: bluetooth}
+			}
 			offset += int(length)
 
 		default:
@@ -1734,6 +1762,310 @@ func UnmarshalLoRaConfig(buf []byte) (*Config_LoRaConfig, error) {
 	}
 
 	return lc, nil
+}
+
+// UnmarshalNetworkConfig decodes a NetworkConfig from protobuf wire format.
+func UnmarshalNetworkConfig(buf []byte) (*Config_NetworkConfig, error) {
+	nc := &Config_NetworkConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // wifi_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			nc.WifiEnabled = v != 0
+			offset += vn
+
+		case 3: // wifi_ssid
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			nc.WifiSsid = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 4: // wifi_psk
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			nc.WifiPsk = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 5: // ntp_server
+			if wireType != WireBytes {
+				offset = skipField(buf, offset, wireType)
+				continue
+			}
+			length, ln := DecodeVarint(buf[offset:])
+			if ln == 0 {
+				break
+			}
+			offset += ln
+			if offset+int(length) > len(buf) {
+				break
+			}
+			nc.NtpServer = string(buf[offset : offset+int(length)])
+			offset += int(length)
+
+		case 6: // eth_enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			nc.EthEnabled = v != 0
+			offset += vn
+
+		case 7: // address_mode
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			nc.AddressMode = uint32(v)
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return nc, nil
+}
+
+// UnmarshalPowerConfig decodes a PowerConfig from protobuf wire format.
+func UnmarshalPowerConfig(buf []byte) (*Config_PowerConfig, error) {
+	pc := &Config_PowerConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // is_power_saving
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			pc.IsPowerSaving = v != 0
+			offset += vn
+
+		case 2: // on_battery_shutdown_after_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			pc.OnBatteryShutdownAfterSecs = uint32(v)
+			offset += vn
+
+		case 4: // wait_bluetooth_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			pc.WaitBluetoothSecs = uint32(v)
+			offset += vn
+
+		case 6: // sds_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			pc.SdsSecs = uint32(v)
+			offset += vn
+
+		case 7: // ls_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			pc.LsSecs = uint32(v)
+			offset += vn
+
+		case 8: // min_wake_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			pc.MinWakeSecs = uint32(v)
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return pc, nil
+}
+
+// UnmarshalDisplayConfig decodes a DisplayConfig from protobuf wire format.
+func UnmarshalDisplayConfig(buf []byte) (*Config_DisplayConfig, error) {
+	dc := &Config_DisplayConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // screen_on_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.ScreenOnSecs = uint32(v)
+			offset += vn
+
+		case 2: // gps_format
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.GpsFormat = uint32(v)
+			offset += vn
+
+		case 3: // auto_screen_carousel_secs
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.AutoScreenCarouselSecs = uint32(v)
+			offset += vn
+
+		case 4: // compass_north_top
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.CompassNorthTop = v != 0
+			offset += vn
+
+		case 5: // flip_screen
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.FlipScreen = v != 0
+			offset += vn
+
+		case 6: // units
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.Units = uint32(v)
+			offset += vn
+
+		case 10: // wake_on_tap_or_motion
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			dc.WakeOnTapOrMotion = v != 0
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return dc, nil
+}
+
+// UnmarshalBluetoothConfig decodes a BluetoothConfig from protobuf wire format.
+func UnmarshalBluetoothConfig(buf []byte) (*Config_BluetoothConfig, error) {
+	bc := &Config_BluetoothConfig{}
+	offset := 0
+
+	for offset < len(buf) {
+		tag, n := DecodeVarint(buf[offset:])
+		if n == 0 {
+			break
+		}
+		offset += n
+
+		field, wireType := DecodeTag(tag)
+
+		switch field {
+		case 1: // enabled
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			bc.Enabled = v != 0
+			offset += vn
+
+		case 2: // mode
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			bc.Mode = Config_BluetoothConfig_PairingMode(v)
+			offset += vn
+
+		case 3: // fixed_pin
+			v, vn := DecodeVarint(buf[offset:])
+			if vn == 0 {
+				break
+			}
+			bc.FixedPin = uint32(v)
+			offset += vn
+
+		default:
+			offset = skipField(buf, offset, wireType)
+			if offset < 0 {
+				break
+			}
+		}
+	}
+
+	return bc, nil
 }
 
 // UnmarshalDeviceMetadata decodes a DeviceMetadata from protobuf wire format.

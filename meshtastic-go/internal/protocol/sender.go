@@ -435,6 +435,54 @@ func (s *Sender) RequestTelemetry(destNode uint32) (uint32, error) {
 	return packetId, nil
 }
 
+// RequestNeighborInfo requests neighbor info from a remote node
+func (s *Sender) RequestNeighborInfo(destNode uint32) (uint32, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	packetId := s.nextPacketId()
+	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
+
+	packet := &pb.MeshPacket{
+		From:     myNodeNum,
+		To:       destNode,
+		Channel:  0,
+		Id:       packetId,
+		WantAck:  true,
+		HopLimit: 3,
+		HopStart: 3,
+		PayloadVariant: &pb.MeshPacket_Decoded{
+			Decoded: &pb.Data{
+				Portnum:      pb.PortNum_NEIGHBORINFO_APP,
+				Payload:      []byte{}, // Empty payload to request neighbor info
+				WantResponse: true,
+			},
+		},
+	}
+
+	toRadio := &pb.ToRadio{
+		PayloadVariant: &pb.ToRadio_Packet{
+			Packet: packet,
+		},
+	}
+
+	data, err := pb.MarshalToRadio(toRadio)
+	if err != nil {
+		return 0, fmt.Errorf("failed to marshal neighbor info request: %w", err)
+	}
+
+	log.Info().
+		Uint32("dest", destNode).
+		Uint32("packetId", packetId).
+		Msg("requesting neighbor info from node")
+
+	if err := s.sendFramed(data); err != nil {
+		return 0, err
+	}
+
+	return packetId, nil
+}
+
 // SetChannel sends a channel configuration to the local node
 func (s *Sender) SetChannel(channel *pb.Channel) (uint32, error) {
 	s.mu.Lock()

@@ -102,6 +102,7 @@ func (s *Server) setupRoutes() {
 			nodes.POST("/:nodeNum/request-info", nodeHandler.RequestInfo)
 			nodes.POST("/:nodeNum/request-position", nodeHandler.RequestPosition)
 			nodes.POST("/:nodeNum/request-telemetry", nodeHandler.RequestTelemetry)
+			nodes.POST("/:nodeNum/request-neighbor-info", nodeHandler.RequestNeighborInfo)
 		}
 
 		// Messages & Contacts
@@ -1092,7 +1093,20 @@ func (s *Server) handleGetNeighborInfo(c *gin.Context) {
 }
 
 func (s *Server) handleRequestNeighborInfo(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	nodeNumStr := c.Param("nodeNum")
+	nodeNum, err := strconv.ParseUint(nodeNumStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid node number"})
+		return
+	}
+
+	packetId, err := s.meshService.RequestNeighborInfo(uint32(nodeNum))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok", "requestId": packetId})
 }
 
 // Device action handlers
