@@ -74,6 +74,11 @@ func (ms *MeshService) setupProcessorHandlers() {
 		ms.mu.Unlock()
 		ms.sender.SetMyNodeNum(myInfo.MyNodeNum)
 
+		// Load historical messages for this node
+		if err := ms.messageService.SetMyNodeNum(myInfo.MyNodeNum); err != nil {
+			log.Error().Err(err).Msg("failed to load historical messages")
+		}
+
 		log.Info().
 			Uint32("nodeNum", myInfo.MyNodeNum).
 			Msg("my node number set")
@@ -363,7 +368,23 @@ func (ms *MeshService) SendTextMessage(to uint32, channel uint32, text string) (
 	if ms.sender == nil {
 		return 0, fmt.Errorf("not connected")
 	}
-	return ms.sender.SendTextMessage(to, channel, text, true)
+	packetId, err := ms.sender.SendTextMessage(to, channel, text, true)
+	if err != nil {
+		return 0, err
+	}
+
+	// Save the sent message
+	msg := ms.messageService.SaveSentMessage(to, channel, packetId, text)
+
+	// Broadcast to websocket
+	ms.wsHub.Broadcast(websocket.Event{
+		Type: "message.sent",
+		Data: map[string]interface{}{
+			"message": msg,
+		},
+	})
+
+	return packetId, nil
 }
 
 // SendPosition sends a position update

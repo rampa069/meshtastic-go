@@ -367,6 +367,59 @@ func (d *MessageDAO) DeleteReaction(replyId uint32, userId, emoji string) error 
 	return err
 }
 
+// GetByContactAndNode retrieves messages for a contact filtered by node
+func (d *MessageDAO) GetByContactAndNode(contactKey string, myNodeNum uint32, limit int) ([]*MessageEntity, error) {
+	query := `
+		SELECT uuid, myNodeNum, port_num, contact_key, received_time, read,
+			data, packet_id, routing_error, snr, rssi, hopsAway, filtered
+		FROM packet
+		WHERE contact_key = ? AND myNodeNum = ?
+		ORDER BY received_time ASC
+		LIMIT ?
+	`
+	return d.queryMessages(query, contactKey, myNodeNum, limit)
+}
+
+// GetAllByNode retrieves all messages for a specific node
+func (d *MessageDAO) GetAllByNode(myNodeNum uint32, limit int) ([]*MessageEntity, error) {
+	query := `
+		SELECT uuid, myNodeNum, port_num, contact_key, received_time, read,
+			data, packet_id, routing_error, snr, rssi, hopsAway, filtered
+		FROM packet
+		WHERE myNodeNum = ?
+		ORDER BY received_time ASC
+		LIMIT ?
+	`
+	return d.queryMessages(query, myNodeNum, limit)
+}
+
+// GetContactsByNode returns contacts for a specific node
+func (d *MessageDAO) GetContactsByNode(myNodeNum uint32) ([]ContactSummary, error) {
+	query := `
+		SELECT contact_key, MAX(received_time) as last_time,
+			SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) as unread_count
+		FROM packet
+		WHERE myNodeNum = ?
+		GROUP BY contact_key
+		ORDER BY last_time DESC
+	`
+	rows, err := d.db.Query(query, myNodeNum)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var contacts []ContactSummary
+	for rows.Next() {
+		var c ContactSummary
+		if err := rows.Scan(&c.ContactKey, &c.LastMessageTime, &c.UnreadCount); err != nil {
+			return nil, err
+		}
+		contacts = append(contacts, c)
+	}
+	return contacts, rows.Err()
+}
+
 // Helper functions
 
 func (d *MessageDAO) queryMessages(query string, args ...interface{}) ([]*MessageEntity, error) {
