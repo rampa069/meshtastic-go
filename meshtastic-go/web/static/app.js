@@ -158,6 +158,10 @@ function initTabs() {
                 loadConfig();
             } else if (tabName === 'map') {
                 initMap();
+            } else if (tabName === 'telemetry') {
+                updateTelemetryNodeSelector();
+            } else if (tabName === 'neighbors') {
+                loadNeighborChartNodes();
             }
         });
     });
@@ -4653,34 +4657,50 @@ function initTelemetryDashboard() {
 }
 
 // Update node selector - only show nodes that have received telemetry data
-function updateTelemetryNodeSelector() {
+async function updateTelemetryNodeSelector() {
     const nodeSelect = document.getElementById('telemetryNodeSelect');
     if (!nodeSelect) return;
 
     const currentValue = nodeSelect.value;
 
-    // Get nodes that have telemetry data
-    const nodesWithTelemetry = Object.keys(telemetryData)
-        .map(num => parseInt(num))
-        .filter(num => {
-            const data = telemetryData[num];
-            return data && (data.device || data.environment || data.power || data.airQuality);
-        })
-        .sort((a, b) => {
-            // Sort by name
-            const nodeA = nodes[a];
-            const nodeB = nodes[b];
-            const nameA = nodeA?.shortName || nodeA?.longName || '';
-            const nameB = nodeB?.shortName || nodeB?.longName || '';
-            return nameA.localeCompare(nameB);
-        });
+    // Get nodes from in-memory data
+    const inMemoryNodes = new Set(
+        Object.keys(telemetryData)
+            .map(num => parseInt(num))
+            .filter(num => {
+                const data = telemetryData[num];
+                return data && (data.device || data.environment || data.power || data.airQuality);
+            })
+    );
+
+    // Also fetch nodes with historical data from database
+    let dbNodes = [];
+    try {
+        const data = await api('GET', '/telemetry/nodes');
+        if (data.nodes) {
+            dbNodes = data.nodes;
+        }
+    } catch (e) {
+        console.warn('Failed to load telemetry nodes from database:', e);
+    }
+
+    // Merge both sources
+    const allNodes = new Set([...inMemoryNodes, ...dbNodes]);
+    const nodesWithTelemetry = Array.from(allNodes).sort((a, b) => {
+        // Sort by name
+        const nodeA = nodes[a];
+        const nodeB = nodes[b];
+        const nameA = nodeA?.shortName || nodeA?.longName || '';
+        const nameB = nodeB?.shortName || nodeB?.longName || '';
+        return nameA.localeCompare(nameB);
+    });
 
     nodeSelect.innerHTML = '<option value="">Select a node...</option>';
 
     if (nodesWithTelemetry.length === 0) {
         const option = document.createElement('option');
         option.disabled = true;
-        option.textContent = 'No telemetry data received yet';
+        option.textContent = 'No telemetry data available';
         nodeSelect.appendChild(option);
         return;
     }
@@ -4689,14 +4709,15 @@ function updateTelemetryNodeSelector() {
         const node = nodes[nodeNum];
         const name = node?.longName || node?.shortName || `Node ${nodeNum}`;
         const nodeId = `!${(nodeNum >>> 0).toString(16)}`;
+        const hasLiveData = inMemoryNodes.has(nodeNum);
         const option = document.createElement('option');
         option.value = nodeNum;
-        option.textContent = `${name} (${nodeId})`;
+        option.textContent = `${name} (${nodeId})${hasLiveData ? '' : ' [historical]'}`;
         nodeSelect.appendChild(option);
     });
 
     // Restore selection if still valid
-    if (currentValue && telemetryData[currentValue]) {
+    if (currentValue && allNodes.has(parseInt(currentValue))) {
         nodeSelect.value = currentValue;
     }
 }
@@ -5850,4 +5871,460 @@ initMap = function() {
             openWaypointModal(e.latlng.lat.toFixed(6), e.latlng.lng.toFixed(6));
         });
     }
+};
+
+// ============================================
+// Historical Charts - Telemetry and Neighbors
+// ============================================
+
+let telemetryChart = null;
+let neighborChart = null;
+let selectedTelemetryChartPeriod = 'day';
+let selectedNeighborChartPeriod = 'day';
+
+// Initialize chart controls
+document.addEventListener('DOMContentLoaded', () => {
+    initTelemetryChartControls();
+    initNeighborChartControls();
+});
+
+// Initialize telemetry chart controls
+function initTelemetryChartControls() {
+    const metricSelect = document.getElementById('telemetryChartMetric');
+    const periodButtons = document.querySelectorAll('#telemetryChartsSection .period-btn');
+
+    if (metricSelect) {
+        metricSelect.addEventListener('change', () => {
+            loadTelemetryChart();
+        });
+    }
+
+    periodButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            periodButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedTelemetryChartPeriod = btn.dataset.period;
+            loadTelemetryChart();
+        });
+    });
+}
+
+// Initialize neighbor chart controls
+function initNeighborChartControls() {
+    const nodeSelect = document.getElementById('neighborChartNode');
+    const periodButtons = document.querySelectorAll('.neighbor-period');
+
+    if (nodeSelect) {
+        nodeSelect.addEventListener('change', () => {
+            loadNeighborChart();
+        });
+    }
+
+    periodButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            periodButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedNeighborChartPeriod = btn.dataset.period;
+            loadNeighborChart();
+        });
+    });
+
+    // Load available nodes
+    loadNeighborChartNodes();
+}
+
+// Load nodes with telemetry data into the chart selector (if needed)
+async function loadTelemetryChartNodes() {
+    try {
+        const data = await api('GET', '/telemetry/nodes');
+        // Nodes are already managed by the telemetry node selector
+        // This function can be used to refresh available nodes for charting
+        console.log('Telemetry nodes:', data.nodes);
+    } catch (e) {
+        console.error('Failed to load telemetry chart nodes:', e);
+    }
+}
+
+// Load nodes with neighbor data into the selector
+async function loadNeighborChartNodes() {
+    const select = document.getElementById('neighborChartNode');
+    if (!select) return;
+
+    const currentValue = select.value;
+
+    // Get nodes from in-memory neighbor data
+    const inMemoryNodes = new Set(Object.keys(neighborInfoData).map(n => parseInt(n)));
+
+    // Also fetch nodes with historical data from database
+    let dbNodes = [];
+    try {
+        const data = await api('GET', '/neighbors/nodes');
+        if (data.nodes) {
+            dbNodes = data.nodes;
+        }
+    } catch (e) {
+        console.warn('Failed to load neighbor nodes from database:', e);
+    }
+
+    // Merge both sources
+    const allNodes = new Set([...inMemoryNodes, ...dbNodes]);
+    const nodeList = Array.from(allNodes).sort((a, b) => {
+        const nodeA = nodes[a];
+        const nodeB = nodes[b];
+        const nameA = nodeA?.shortName || nodeA?.longName || '';
+        const nameB = nodeB?.shortName || nodeB?.longName || '';
+        return nameA.localeCompare(nameB);
+    });
+
+    // Keep the default option
+    select.innerHTML = '<option value="">Select a node...</option>';
+
+    if (nodeList.length === 0) {
+        const option = document.createElement('option');
+        option.disabled = true;
+        option.textContent = 'No neighbor data available';
+        select.appendChild(option);
+        return;
+    }
+
+    nodeList.forEach(nodeNum => {
+        const node = nodes[nodeNum];
+        const displayName = getNodeDisplayName(nodeNum, node);
+        const hasLiveData = inMemoryNodes.has(nodeNum);
+        const option = document.createElement('option');
+        option.value = nodeNum;
+        option.textContent = `${displayName}${hasLiveData ? '' : ' [historical]'}`;
+        select.appendChild(option);
+    });
+
+    // Restore selection if still valid
+    if (currentValue && allNodes.has(parseInt(currentValue))) {
+        select.value = currentValue;
+    }
+}
+
+// Helper to get node display name
+function getNodeDisplayName(nodeNum, node) {
+    const nodeId = `!${(parseInt(nodeNum) >>> 0).toString(16)}`;
+    if (node) {
+        if (node.longName) return `${node.longName} (${nodeId})`;
+        if (node.shortName) return `${node.shortName} (${nodeId})`;
+    }
+    return nodeId;
+}
+
+// Load and render telemetry chart
+async function loadTelemetryChart() {
+    const nodeNum = selectedTelemetryNode;
+    const metric = document.getElementById('telemetryChartMetric')?.value || 'battery_level';
+    const period = selectedTelemetryChartPeriod;
+
+    const chartEmpty = document.getElementById('telemetryChartEmpty');
+    const chartContainer = document.querySelector('#telemetryChartsSection .chart-container');
+
+    if (!nodeNum) {
+        if (chartEmpty) chartEmpty.style.display = 'flex';
+        if (chartContainer) chartContainer.style.display = 'none';
+        return;
+    }
+
+    try {
+        const data = await api('GET', `/telemetry/${nodeNum}/aggregated?metric=${metric}&period=${period}`);
+
+        if (!data.data || data.data.length === 0) {
+            if (chartEmpty) {
+                chartEmpty.innerHTML = '<p>No historical data available for this metric</p>';
+                chartEmpty.style.display = 'flex';
+            }
+            if (chartContainer) chartContainer.style.display = 'none';
+            return;
+        }
+
+        if (chartEmpty) chartEmpty.style.display = 'none';
+        if (chartContainer) chartContainer.style.display = 'block';
+
+        renderTelemetryChart(data.data, metric, period);
+    } catch (e) {
+        console.error('Failed to load telemetry chart:', e);
+        if (chartEmpty) {
+            chartEmpty.innerHTML = '<p>Failed to load chart data</p>';
+            chartEmpty.style.display = 'flex';
+        }
+    }
+}
+
+// Render telemetry chart using Chart.js
+function renderTelemetryChart(data, metric, period) {
+    const canvas = document.getElementById('telemetryChart');
+    if (!canvas) return;
+
+    // Destroy existing chart
+    if (telemetryChart) {
+        telemetryChart.destroy();
+    }
+
+    const labels = data.map(point => formatChartLabel(point.timestamp, period));
+    const values = data.map(point => point.avg);
+    const minValues = data.map(point => point.min);
+    const maxValues = data.map(point => point.max);
+
+    const metricLabels = {
+        battery_level: 'Battery Level (%)',
+        voltage: 'Voltage (V)',
+        channel_utilization: 'Channel Utilization (%)',
+        air_util_tx: 'Air Time TX (%)',
+        temperature: 'Temperature (°C)',
+        relative_humidity: 'Humidity (%)',
+        barometric_pressure: 'Pressure (hPa)'
+    };
+
+    const ctx = canvas.getContext('2d');
+    telemetryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Average',
+                    data: values,
+                    borderColor: '#306A42',
+                    backgroundColor: 'rgba(48, 106, 66, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    borderWidth: 2.5
+                },
+                {
+                    label: 'Min',
+                    data: minValues,
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    borderDash: [6, 3],
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    borderWidth: 1.5
+                },
+                {
+                    label: 'Max',
+                    data: maxValues,
+                    borderColor: '#FF5722',
+                    backgroundColor: 'rgba(255, 87, 34, 0.1)',
+                    borderDash: [2, 2],
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    borderWidth: 1.5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: metricLabels[metric] || metric
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: metricLabels[metric] || metric
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Load and render neighbor chart
+async function loadNeighborChart() {
+    const nodeNum = document.getElementById('neighborChartNode')?.value;
+    const period = selectedNeighborChartPeriod;
+
+    const chartEmpty = document.getElementById('neighborChartEmpty');
+    const chartContainer = document.querySelector('.neighbor-chart-section .chart-container');
+
+    if (!nodeNum) {
+        if (chartEmpty) chartEmpty.style.display = 'flex';
+        if (chartContainer) chartContainer.style.display = 'none';
+        return;
+    }
+
+    try {
+        const data = await api('GET', `/neighbors/${nodeNum}/chart?period=${period}`);
+
+        if (!data.data || data.data.length === 0) {
+            if (chartEmpty) {
+                chartEmpty.innerHTML = '<p>No historical data available for this node</p>';
+                chartEmpty.style.display = 'flex';
+            }
+            if (chartContainer) chartContainer.style.display = 'none';
+            return;
+        }
+
+        if (chartEmpty) chartEmpty.style.display = 'none';
+        if (chartContainer) chartContainer.style.display = 'block';
+
+        renderNeighborChart(data.data, period);
+    } catch (e) {
+        console.error('Failed to load neighbor chart:', e);
+        if (chartEmpty) {
+            chartEmpty.innerHTML = '<p>Failed to load chart data</p>';
+            chartEmpty.style.display = 'flex';
+        }
+    }
+}
+
+// Render neighbor chart using Chart.js
+function renderNeighborChart(data, period) {
+    const canvas = document.getElementById('neighborChart');
+    if (!canvas) return;
+
+    // Destroy existing chart
+    if (neighborChart) {
+        neighborChart.destroy();
+    }
+
+    const labels = data.map(point => formatChartLabel(point.timestamp, period));
+    const avgCounts = data.map(point => point.avgCount);
+    const maxCounts = data.map(point => point.maxCount);
+    const avgSnr = data.map(point => point.avgSnr);
+
+    const ctx = canvas.getContext('2d');
+    neighborChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Avg Neighbors',
+                    data: avgCounts,
+                    backgroundColor: 'rgba(48, 106, 66, 0.8)',
+                    borderColor: '#306A42',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    yAxisID: 'y',
+                    order: 2
+                },
+                {
+                    label: 'Max Neighbors',
+                    data: maxCounts,
+                    backgroundColor: 'rgba(33, 150, 243, 0.5)',
+                    borderColor: '#2196F3',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    yAxisID: 'y',
+                    order: 3
+                },
+                {
+                    label: 'Avg SNR (dB)',
+                    data: avgSnr,
+                    type: 'line',
+                    borderColor: '#FF5722',
+                    backgroundColor: 'rgba(255, 87, 34, 0.1)',
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2.5,
+                    yAxisID: 'y1',
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Neighbor Count & Signal Quality Over Time'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Neighbor Count'
+                    },
+                    min: 0
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'SNR (dB)'
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Format chart label based on period
+function formatChartLabel(timestamp, period) {
+    const date = new Date(timestamp * 1000);
+    switch (period) {
+        case 'day':
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        case 'month':
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        case 'year':
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        default:
+            return date.toLocaleString();
+    }
+}
+
+// Update telemetry chart when node is selected
+const originalRenderTelemetryDashboard = typeof renderTelemetryDashboard !== 'undefined' ? renderTelemetryDashboard : null;
+if (originalRenderTelemetryDashboard) {
+    renderTelemetryDashboard = function(nodeNum) {
+        originalRenderTelemetryDashboard(nodeNum);
+        // Load chart when dashboard is rendered
+        loadTelemetryChart();
+    };
+}
+
+// Refresh neighbor nodes when new neighbor info is received
+const originalHandleNeighborInfoUpdated = handleNeighborInfoUpdated;
+handleNeighborInfoUpdated = function(data) {
+    originalHandleNeighborInfoUpdated(data);
+    // Refresh the node selector in case this is a new node
+    loadNeighborChartNodes();
 };

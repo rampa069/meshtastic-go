@@ -76,6 +76,15 @@ type TelemetryStats struct {
 	LastTime  int64         `json:"lastTime"`
 }
 
+// TelemetryAggregatePoint represents aggregated telemetry data for a time period
+type TelemetryAggregatePoint struct {
+	Timestamp int64   `json:"timestamp"`
+	Avg       float64 `json:"avg"`
+	Min       float64 `json:"min"`
+	Max       float64 `json:"max"`
+	Count     int     `json:"count"`
+}
+
 // TelemetryDAO provides data access operations for telemetry
 type TelemetryDAO struct {
 	db *sql.DB
@@ -268,6 +277,95 @@ func (d *TelemetryDAO) GetEnvironmentStats(nodeNum uint32, since int64) (map[str
 		}
 	}
 	return result, nil
+}
+
+// GetAggregatedByPeriod retrieves aggregated telemetry data grouped by time period
+// Supported fields: battery_level, voltage, channel_utilization, air_util_tx, uptime_seconds,
+// temperature, relative_humidity, barometric_pressure, etc.
+func (d *TelemetryDAO) GetAggregatedByPeriod(
+	nodeNum uint32,
+	telemetryType TelemetryType,
+	field string,
+	startTime, endTime int64,
+	periodSeconds int64,
+) ([]*TelemetryAggregatePoint, error) {
+	// Validate field name to prevent SQL injection (only allow known columns)
+	validFields := map[string]bool{
+		"battery_level": true, "voltage": true, "channel_utilization": true,
+		"air_util_tx": true, "uptime_seconds": true, "temperature": true,
+		"relative_humidity": true, "barometric_pressure": true, "gas_resistance": true,
+		"iaq": true, "distance": true, "lux": true, "uv_lux": true,
+		"wind_speed": true, "wind_direction": true, "rainfall": true,
+		"ch1_voltage": true, "ch1_current": true, "ch2_voltage": true,
+		"ch2_current": true, "ch3_voltage": true, "ch3_current": true,
+		"pm10": true, "pm25": true, "pm100": true, "co2": true,
+	}
+	if !validFields[field] {
+		return nil, nil // Invalid field, return empty
+	}
+
+	query := `
+		SELECT
+			(timestamp / ?) * ? as period_start,
+			AVG(` + field + `) as avg_val,
+			MIN(` + field + `) as min_val,
+			MAX(` + field + `) as max_val,
+			COUNT(*) as count
+		FROM telemetry
+		WHERE node_num = ? AND telemetry_type = ? AND timestamp >= ? AND timestamp <= ? AND ` + field + ` IS NOT NULL
+		GROUP BY period_start
+		ORDER BY period_start ASC
+	`
+
+	rows, err := d.db.Query(query, periodSeconds, periodSeconds, nodeNum, telemetryType, startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []*TelemetryAggregatePoint
+	for rows.Next() {
+		point := &TelemetryAggregatePoint{}
+		var avgVal, minVal, maxVal sql.NullFloat64
+		if err := rows.Scan(&point.Timestamp, &avgVal, &minVal, &maxVal, &point.Count); err != nil {
+			return nil, err
+		}
+		if avgVal.Valid {
+			point.Avg = avgVal.Float64
+		}
+		if minVal.Valid {
+			point.Min = minVal.Float64
+		}
+		if maxVal.Valid {
+			point.Max = maxVal.Float64
+		}
+		result = append(result, point)
+	}
+	return result, rows.Err()
+}
+
+// GetNodesWithTelemetry returns all node numbers that have telemetry data
+func (d *TelemetryDAO) GetNodesWithTelemetry() ([]uint32, error) {
+	query := `
+		SELECT DISTINCT node_num
+		FROM telemetry
+		ORDER BY node_num
+	`
+	rows, err := d.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []uint32
+	for rows.Next() {
+		var nodeNum uint32
+		if err := rows.Scan(&nodeNum); err != nil {
+			return nil, err
+		}
+		result = append(result, nodeNum)
+	}
+	return result, rows.Err()
 }
 
 // DeleteOlderThan removes telemetry records older than the given timestamp

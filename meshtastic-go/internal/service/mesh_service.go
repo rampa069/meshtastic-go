@@ -32,6 +32,7 @@ type MeshService struct {
 	messageService   *MessageService
 	configManager    *ConfigManager
 	telemetryService *TelemetryService
+	neighborService  *NeighborService
 }
 
 // NewMeshService creates a new mesh service
@@ -59,6 +60,7 @@ func NewMeshService(db *database.Database, radioManager *radio.Manager, wsHub *w
 	ms.messageService = NewMessageService(db, wsHub)
 	ms.configManager = NewConfigManager(wsHub)
 	ms.telemetryService = NewTelemetryService(dao.NewTelemetryDAO(db.DB()), wsHub)
+	ms.neighborService = NewNeighborService(dao.NewNeighborDAO(db.DB()), wsHub)
 
 	return ms
 }
@@ -218,6 +220,9 @@ func (ms *MeshService) setupProcessorHandlers() {
 
 		// Also update the node's neighbor list in the node manager
 		ms.nodeManager.UpdateNodeNeighbors(from, neighborInfo)
+
+		// Store neighbor info in database for historical tracking
+		ms.neighborService.ProcessNeighborInfo(from, neighborInfo)
 	})
 
 	// Handle waypoint updates
@@ -492,6 +497,11 @@ func (ms *MeshService) ConfigManager() *ConfigManager {
 // TelemetryService returns the telemetry service
 func (ms *MeshService) TelemetryService() *TelemetryService {
 	return ms.telemetryService
+}
+
+// NeighborService returns the neighbor service
+func (ms *MeshService) NeighborService() *NeighborService {
+	return ms.neighborService
 }
 
 // RadioCallbacks implementation

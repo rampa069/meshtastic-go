@@ -459,3 +459,53 @@ func (ts *TelemetryService) CleanupOldData(maxAge time.Duration) (int64, error) 
 	cutoff := time.Now().Add(-maxAge)
 	return ts.telemetryDAO.DeleteOlderThan(cutoff)
 }
+
+// GetAggregatedData retrieves aggregated telemetry data for charting
+// period: "day" (24h by hour), "month" (30d by day), "year" (12m by week)
+func (ts *TelemetryService) GetAggregatedData(nodeNum uint32, metric string, period string) ([]*dao.TelemetryAggregatePoint, error) {
+	now := time.Now().Unix()
+	var startTime int64
+	var periodSeconds int64
+
+	switch period {
+	case "day":
+		startTime = now - 24*60*60        // Last 24 hours
+		periodSeconds = 60 * 60           // 1 hour periods
+	case "month":
+		startTime = now - 30*24*60*60     // Last 30 days
+		periodSeconds = 24 * 60 * 60      // 1 day periods
+	case "year":
+		startTime = now - 365*24*60*60    // Last 12 months
+		periodSeconds = 7 * 24 * 60 * 60  // 1 week periods
+	default:
+		startTime = now - 24*60*60
+		periodSeconds = 60 * 60
+	}
+
+	// Determine telemetry type from metric name
+	telemetryType := ts.getTelemetryTypeForMetric(metric)
+
+	return ts.telemetryDAO.GetAggregatedByPeriod(nodeNum, telemetryType, metric, startTime, now, periodSeconds)
+}
+
+// getTelemetryTypeForMetric returns the telemetry type for a given metric field
+func (ts *TelemetryService) getTelemetryTypeForMetric(metric string) dao.TelemetryType {
+	switch metric {
+	case "battery_level", "voltage", "channel_utilization", "air_util_tx", "uptime_seconds":
+		return dao.TelemetryTypeDevice
+	case "temperature", "relative_humidity", "barometric_pressure", "gas_resistance", "iaq",
+		"distance", "lux", "uv_lux", "wind_speed", "wind_direction", "rainfall":
+		return dao.TelemetryTypeEnvironment
+	case "ch1_voltage", "ch1_current", "ch2_voltage", "ch2_current", "ch3_voltage", "ch3_current":
+		return dao.TelemetryTypePower
+	case "pm10", "pm25", "pm100", "co2":
+		return dao.TelemetryTypeAirQuality
+	default:
+		return dao.TelemetryTypeDevice
+	}
+}
+
+// GetNodesWithData returns all nodes that have telemetry data
+func (ts *TelemetryService) GetNodesWithData() ([]uint32, error) {
+	return ts.telemetryDAO.GetNodesWithTelemetry()
+}

@@ -233,6 +233,27 @@ var migrations = []string{
 	`CREATE INDEX IF NOT EXISTS idx_traceroutes_to_node ON traceroutes(to_node)`,
 	`CREATE INDEX IF NOT EXISTS idx_traceroutes_timestamp ON traceroutes(timestamp)`,
 	`CREATE INDEX IF NOT EXISTS idx_traceroutes_from_to ON traceroutes(from_node, to_node)`,
+
+	// Migration 21: Create neighbor_history table
+	`CREATE TABLE IF NOT EXISTS neighbor_history (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		node_num INTEGER NOT NULL,
+		neighbor_node_num INTEGER NOT NULL,
+		snr REAL NOT NULL,
+		timestamp INTEGER NOT NULL
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_neighbor_history_node ON neighbor_history(node_num)`,
+	`CREATE INDEX IF NOT EXISTS idx_neighbor_history_time ON neighbor_history(timestamp)`,
+
+	// Migration 22: Create neighbor_snapshots table
+	`CREATE TABLE IF NOT EXISTS neighbor_snapshots (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		node_num INTEGER NOT NULL,
+		neighbor_count INTEGER NOT NULL,
+		avg_snr REAL,
+		timestamp INTEGER NOT NULL
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_neighbor_snapshots_lookup ON neighbor_snapshots(node_num, timestamp)`,
 }
 
 func Run(db *sql.DB) error {

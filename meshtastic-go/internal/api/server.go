@@ -185,10 +185,13 @@ func (s *Server) setupRoutes() {
 		// Telemetry & Diagnostics
 		telemetry := v1.Group("/telemetry")
 		{
+			// Static routes must come before parameterized routes
+			telemetry.GET("/nodes", s.handleGetTelemetryNodes)
 			telemetry.GET("/:nodeNum", s.handleGetTelemetry)
 			telemetry.GET("/:nodeNum/latest", s.handleGetLatestTelemetry)
 			telemetry.GET("/:nodeNum/history", s.handleGetTelemetryHistory)
 			telemetry.GET("/:nodeNum/stats", s.handleGetTelemetryStats)
+			telemetry.GET("/:nodeNum/aggregated", s.handleGetTelemetryAggregated)
 			telemetry.POST("/:nodeNum/request", s.handleRequestTelemetry)
 		}
 
@@ -202,6 +205,14 @@ func (s *Server) setupRoutes() {
 		{
 			neighborInfo.GET("/:nodeNum", s.handleGetNeighborInfo)
 			neighborInfo.POST("/:nodeNum", s.handleRequestNeighborInfo)
+		}
+
+		// Neighbors (historical data and charts)
+		neighbors := v1.Group("/neighbors")
+		{
+			neighbors.GET("/nodes", s.handleGetNeighborNodes)
+			neighbors.GET("/:nodeNum/history", s.handleGetNeighborHistory)
+			neighbors.GET("/:nodeNum/chart", s.handleGetNeighborChart)
 		}
 
 		// MQTT Bridge
@@ -1106,6 +1117,41 @@ func (s *Server) handleRequestTelemetry(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "requestId": packetId})
 }
 
+func (s *Server) handleGetTelemetryAggregated(c *gin.Context) {
+	nodeNumStr := c.Param("nodeNum")
+	nodeNum, err := strconv.ParseUint(nodeNumStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid node number"})
+		return
+	}
+
+	metric := c.DefaultQuery("metric", "battery_level")
+	period := c.DefaultQuery("period", "day")
+
+	data, err := s.meshService.TelemetryService().GetAggregatedData(uint32(nodeNum), metric, period)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":   data,
+		"metric": metric,
+		"period": period,
+		"count":  len(data),
+	})
+}
+
+func (s *Server) handleGetTelemetryNodes(c *gin.Context) {
+	nodes, err := s.meshService.TelemetryService().GetNodesWithData()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"nodes": nodes})
+}
+
 // Traceroute handlers
 func (s *Server) handleGetTraceroute(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"traceroute": nil})
@@ -1148,6 +1194,63 @@ func (s *Server) handleRequestNeighborInfo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok", "requestId": packetId})
+}
+
+// Neighbor historical data handlers
+func (s *Server) handleGetNeighborNodes(c *gin.Context) {
+	nodes, err := s.meshService.NeighborService().GetNodesWithData()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"nodes": nodes})
+}
+
+func (s *Server) handleGetNeighborHistory(c *gin.Context) {
+	nodeNumStr := c.Param("nodeNum")
+	nodeNum, err := strconv.ParseUint(nodeNumStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid node number"})
+		return
+	}
+
+	limitStr := c.DefaultQuery("limit", "100")
+	limit, _ := strconv.Atoi(limitStr)
+	if limit <= 0 || limit > 1000 {
+		limit = 100
+	}
+
+	history, err := s.meshService.NeighborService().GetHistory(uint32(nodeNum), limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"history": history, "count": len(history)})
+}
+
+func (s *Server) handleGetNeighborChart(c *gin.Context) {
+	nodeNumStr := c.Param("nodeNum")
+	nodeNum, err := strconv.ParseUint(nodeNumStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid node number"})
+		return
+	}
+
+	period := c.DefaultQuery("period", "day")
+
+	data, err := s.meshService.NeighborService().GetChartData(uint32(nodeNum), period)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":   data,
+		"period": period,
+		"count":  len(data),
+	})
 }
 
 // Device action handlers
