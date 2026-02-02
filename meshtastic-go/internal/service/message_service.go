@@ -103,9 +103,12 @@ func (ms *MessageService) ProcessTextMessage(from, to, channel uint32, text stri
 	defer ms.mu.Unlock()
 
 	// Generate contact key
-	contactKey := fmt.Sprintf("!%x", from)
-	if to != 0xFFFFFFFF { // Not broadcast
-		contactKey = fmt.Sprintf("!%x", to)
+	var contactKey string
+	if to == 0xFFFFFFFF { // Broadcast - use channel
+		contactKey = fmt.Sprintf("channel:%d", channel)
+	} else {
+		// DM - use the sender (from) as the contact key for received messages
+		contactKey = fmt.Sprintf("!%x", from)
 	}
 
 	// Create message
