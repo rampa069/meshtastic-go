@@ -3984,8 +3984,13 @@ function updateMapMarkers() {
     if (Object.keys(mapMarkers).length === nodesWithPosition.length && nodesWithPosition.length > 0) {
         // Check if this is first time loading markers
         if (!leafletMap._boundsSet && nodesWithPosition.length > 1) {
-            const bounds = L.latLngBounds(nodesWithPosition.map(n => [n.latitude, n.longitude]));
-            leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            // Center on connected node if position available, otherwise fit all
+            if (myNode && myNode.latitude && myNode.longitude) {
+                leafletMap.setView([myNode.latitude, myNode.longitude], 14);
+            } else {
+                const bounds = L.latLngBounds(nodesWithPosition.map(n => [n.latitude, n.longitude]));
+                leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            }
             leafletMap._boundsSet = true;
         }
     }
