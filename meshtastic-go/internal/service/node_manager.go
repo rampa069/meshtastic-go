@@ -228,7 +228,7 @@ func (nm *NodeManager) SetNotes(num uint32, notes string) error {
 }
 
 // ProcessNodeInfo processes a NodeInfo protobuf message and returns the updated Node
-func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
+func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo, meta protocol.PacketMeta) *Node {
 	if nodeInfo == nil {
 		return nil
 	}
@@ -264,11 +264,6 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 		node.Altitude = nodeInfo.Position.Altitude
 	}
 
-	// Update signal info
-	if nodeInfo.Snr != 0 {
-		node.SNR = nodeInfo.Snr
-	}
-
 	// Update last heard
 	if nodeInfo.LastHeard != 0 {
 		node.LastHeard = int64(nodeInfo.LastHeard)
@@ -280,14 +275,17 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 	node.Channel = int32(nodeInfo.Channel)
 	node.IsFavorite = nodeInfo.IsFavorite
 
-	// Only update radio metadata when we have real radio data
-	// NodeInfo from serial config dump has Hops=0, Snr=0, ViaMqtt=false
-	// which would incorrectly mark all nodes as "direct"
-	if nodeInfo.Hops > 0 {
-		node.HopsAway = int32(nodeInfo.Hops)
+	// Update radio metadata from PacketMeta (has real packet data)
+	// Only update when we have real radio data (HopsAway >= 0 means HopStart > 0)
+	if meta.HopsAway >= 0 {
+		node.HopsAway = meta.HopsAway
+		node.ViaMqtt = meta.ViaMqtt
 	}
-	if nodeInfo.Snr != 0 || nodeInfo.Hops > 0 {
-		node.ViaMqtt = nodeInfo.ViaMqtt
+	if meta.SNR != 0 {
+		node.SNR = meta.SNR
+	}
+	if meta.RSSI != 0 {
+		node.RSSI = meta.RSSI
 	}
 
 	// Update device metrics if available
@@ -303,7 +301,8 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 		Str("longName", node.LongName).
 		Str("shortName", node.ShortName).
 		Bool("viaMqtt", node.ViaMqtt).
-		Bool("nodeInfoViaMqtt", nodeInfo.ViaMqtt).
+		Int32("hopsAway", node.HopsAway).
+		Int32("rssi", node.RSSI).
 		Msg("processed node info")
 
 	return node

@@ -85,8 +85,8 @@ func (ms *MeshService) setupProcessorHandlers() {
 	})
 
 	// Handle node info updates
-	ms.processor.SetNodeHandler(func(nodeInfo *pb.NodeInfo) {
-		node := ms.nodeManager.ProcessNodeInfo(nodeInfo)
+	ms.processor.SetNodeHandler(func(nodeInfo *pb.NodeInfo, meta protocol.PacketMeta) {
+		node := ms.nodeManager.ProcessNodeInfo(nodeInfo, meta)
 		if node != nil {
 			ms.wsHub.Broadcast(websocket.Event{
 				Type: "node.updated",

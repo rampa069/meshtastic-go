@@ -13,7 +13,7 @@ import (
 type PacketHandler func(packet *pb.MeshPacket)
 
 // NodeHandler is called when node info is received
-type NodeHandler func(nodeInfo *pb.NodeInfo)
+type NodeHandler func(nodeInfo *pb.NodeInfo, meta PacketMeta)
 
 // MyInfoHandler is called when my node info is received
 type MyInfoHandler func(myInfo *pb.MyNodeInfo)
@@ -331,7 +331,8 @@ func (p *Processor) handleNodeInfo(nodeInfo *pb.NodeInfo) {
 	p.mu.RUnlock()
 
 	if handler != nil {
-		handler(nodeInfo)
+		// Config dump from serial — no real radio metadata
+		handler(nodeInfo, PacketMeta{HopsAway: -1})
 	}
 }
 
@@ -500,7 +501,7 @@ func (p *Processor) handleNodeInfoApp(packet *pb.MeshPacket, data *pb.Data) {
 	p.mu.RUnlock()
 
 	if handler != nil {
-		handler(nodeInfo)
+		handler(nodeInfo, meta)
 	}
 }
 
