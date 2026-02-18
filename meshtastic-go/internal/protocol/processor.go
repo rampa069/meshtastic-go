@@ -24,11 +24,38 @@ type ConfigCompleteHandler func(configId uint32)
 // MessageHandler handles decoded text messages
 type MessageHandler func(from uint32, to uint32, channel uint32, text string, rxTime uint32, packetId uint32)
 
+// PacketMeta carries radio metadata from a received mesh packet
+type PacketMeta struct {
+	ViaMqtt  bool
+	HopsAway int32 // -1 = unknown, 0 = direct, >0 = relayed
+	SNR      float32
+	RSSI     int32
+}
+
+// packetMeta extracts radio metadata from a mesh packet
+func packetMeta(packet *pb.MeshPacket) PacketMeta {
+	meta := PacketMeta{
+		ViaMqtt:  packet.ViaMqtt,
+		HopsAway: -1,
+		SNR:      packet.RxSnr,
+		RSSI:     packet.RxRssi,
+	}
+	// Calculate hops from HopStart - HopLimit
+	if packet.HopStart > 0 {
+		meta.HopsAway = int32(packet.HopStart - packet.HopLimit)
+	}
+	// RSSI=0 with non-zero SNR strongly indicates MQTT-relayed packet
+	if packet.RxRssi == 0 && !packet.ViaMqtt {
+		meta.ViaMqtt = true
+	}
+	return meta
+}
+
 // PositionHandler handles position updates
-type PositionHandler func(from uint32, position *pb.Position, viaMqtt bool)
+type PositionHandler func(from uint32, position *pb.Position, meta PacketMeta)
 
 // TelemetryHandler handles telemetry data
-type TelemetryHandler func(from uint32, telemetry *pb.Telemetry, viaMqtt bool)
+type TelemetryHandler func(from uint32, telemetry *pb.Telemetry, meta PacketMeta)
 
 // ChannelHandler handles channel info
 type ChannelHandler func(channel *pb.Channel)
@@ -46,7 +73,7 @@ type TracerouteHandler func(from uint32, route *pb.RouteDiscovery)
 type NeighborInfoHandler func(from uint32, neighborInfo *pb.NeighborInfo)
 
 // WaypointHandler handles waypoint updates
-type WaypointHandler func(from uint32, waypoint *pb.Waypoint, viaMqtt bool)
+type WaypointHandler func(from uint32, waypoint *pb.Waypoint, meta PacketMeta)
 
 // ModuleConfigHandler handles module config updates
 type ModuleConfigHandler func(moduleConfig *pb.ModuleConfig)
@@ -432,7 +459,7 @@ func (p *Processor) handlePositionApp(packet *pb.MeshPacket, data *pb.Data) {
 	p.mu.RUnlock()
 
 	if handler != nil {
-		handler(packet.From, position, packet.ViaMqtt)
+		handler(packet.From, position, packetMeta(packet))
 	}
 }
 
@@ -444,13 +471,19 @@ func (p *Processor) handleNodeInfoApp(packet *pb.MeshPacket, data *pb.Data) {
 	}
 
 	// Create a NodeInfo from the user data
+	meta := packetMeta(packet)
+	var hops uint32
+	if meta.HopsAway > 0 {
+		hops = uint32(meta.HopsAway)
+	}
 	nodeInfo := &pb.NodeInfo{
 		Num:       packet.From,
 		User:      user,
 		LastHeard: uint32(time.Now().Unix()),
 		Snr:       packet.RxSnr,
 		Channel:   packet.Channel,
-		ViaMqtt:   packet.ViaMqtt,
+		ViaMqtt:   meta.ViaMqtt,
+		Hops:      hops,
 	}
 
 	log.Debug().
@@ -498,7 +531,7 @@ func (p *Processor) handleTelemetryApp(packet *pb.MeshPacket, data *pb.Data) {
 	p.mu.RUnlock()
 
 	if handler != nil {
-		handler(packet.From, telemetry, packet.ViaMqtt)
+		handler(packet.From, telemetry, packetMeta(packet))
 	}
 }
 
@@ -522,7 +555,7 @@ func (p *Processor) handleWaypointApp(packet *pb.MeshPacket, data *pb.Data) {
 	p.mu.RUnlock()
 
 	if handler != nil {
-		handler(packet.From, waypoint, packet.ViaMqtt)
+		handler(packet.From, waypoint, packetMeta(packet))
 	}
 }
 

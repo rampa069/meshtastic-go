@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/meshtastic/meshtastic-go/internal/database"
+	"github.com/meshtastic/meshtastic-go/internal/protocol"
 	"github.com/meshtastic/meshtastic-go/internal/util"
 	"github.com/meshtastic/meshtastic-go/internal/websocket"
 	"github.com/meshtastic/meshtastic-go/pkg/pb"
@@ -304,7 +305,7 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 }
 
 // UpdateNodePosition updates a node's position from a Position protobuf
-func (nm *NodeManager) UpdateNodePosition(nodeNum uint32, position *pb.Position, viaMqtt bool) {
+func (nm *NodeManager) UpdateNodePosition(nodeNum uint32, position *pb.Position, meta protocol.PacketMeta) {
 	if position == nil {
 		return
 	}
@@ -325,18 +326,28 @@ func (nm *NodeManager) UpdateNodePosition(nodeNum uint32, position *pb.Position,
 	node.Longitude = position.Longitude()
 	node.Altitude = position.Altitude
 	node.LastHeard = time.Now().Unix()
-	node.ViaMqtt = viaMqtt
+	node.ViaMqtt = meta.ViaMqtt
+	if meta.HopsAway >= 0 {
+		node.HopsAway = meta.HopsAway
+	}
+	if meta.SNR != 0 {
+		node.SNR = meta.SNR
+	}
+	if meta.RSSI != 0 {
+		node.RSSI = meta.RSSI
+	}
 
 	log.Debug().
 		Uint32("num", nodeNum).
 		Float64("lat", node.Latitude).
 		Float64("lon", node.Longitude).
-		Bool("viaMqtt", viaMqtt).
+		Bool("viaMqtt", meta.ViaMqtt).
+		Int32("hopsAway", meta.HopsAway).
 		Msg("updated node position")
 }
 
 // UpdateNodeTelemetry updates a node's telemetry from a Telemetry protobuf
-func (nm *NodeManager) UpdateNodeTelemetry(nodeNum uint32, telemetry *pb.Telemetry, viaMqtt bool) {
+func (nm *NodeManager) UpdateNodeTelemetry(nodeNum uint32, telemetry *pb.Telemetry, meta protocol.PacketMeta) {
 	if telemetry == nil {
 		return
 	}
@@ -392,11 +403,21 @@ func (nm *NodeManager) UpdateNodeTelemetry(nodeNum uint32, telemetry *pb.Telemet
 	}
 
 	node.LastHeard = time.Now().Unix()
-	node.ViaMqtt = viaMqtt
+	node.ViaMqtt = meta.ViaMqtt
+	if meta.HopsAway >= 0 {
+		node.HopsAway = meta.HopsAway
+	}
+	if meta.SNR != 0 {
+		node.SNR = meta.SNR
+	}
+	if meta.RSSI != 0 {
+		node.RSSI = meta.RSSI
+	}
 
 	log.Debug().
 		Uint32("num", nodeNum).
-		Bool("viaMqtt", viaMqtt).
+		Bool("viaMqtt", meta.ViaMqtt).
+		Int32("hopsAway", meta.HopsAway).
 		Msg("updated node telemetry")
 }
 

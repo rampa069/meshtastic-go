@@ -124,16 +124,16 @@ func (ms *MeshService) setupProcessorHandlers() {
 	})
 
 	// Handle position updates
-	ms.processor.SetPositionHandler(func(from uint32, position *pb.Position, viaMqtt bool) {
-		ms.nodeManager.UpdateNodePosition(from, position, viaMqtt)
+	ms.processor.SetPositionHandler(func(from uint32, position *pb.Position, meta protocol.PacketMeta) {
+		ms.nodeManager.UpdateNodePosition(from, position, meta)
 	})
 
 	// Handle telemetry updates
-	ms.processor.SetTelemetryHandler(func(from uint32, telemetry *pb.Telemetry, viaMqtt bool) {
+	ms.processor.SetTelemetryHandler(func(from uint32, telemetry *pb.Telemetry, meta protocol.PacketMeta) {
 		// Update node with latest telemetry
-		ms.nodeManager.UpdateNodeTelemetry(from, telemetry, viaMqtt)
+		ms.nodeManager.UpdateNodeTelemetry(from, telemetry, meta)
 		// Store telemetry in history and broadcast
-		ms.telemetryService.ProcessTelemetry(from, telemetry, viaMqtt)
+		ms.telemetryService.ProcessTelemetry(from, telemetry, meta.ViaMqtt)
 	})
 
 	// Handle config complete
@@ -249,7 +249,7 @@ func (ms *MeshService) setupProcessorHandlers() {
 	})
 
 	// Handle waypoint updates
-	ms.processor.SetWaypointHandler(func(from uint32, waypoint *pb.Waypoint, viaMqtt bool) {
+	ms.processor.SetWaypointHandler(func(from uint32, waypoint *pb.Waypoint, meta protocol.PacketMeta) {
 		// Store waypoint in database
 		waypointDAO := dao.NewWaypointDAO(ms.db.DB())
 		waypointEntity := &dao.WaypointEntity{
@@ -262,7 +262,7 @@ func (ms *MeshService) setupProcessorHandlers() {
 			Description: waypoint.Description,
 			Icon:        waypoint.Icon,
 			FromNode:    from,
-			ViaMqtt:     viaMqtt,
+			ViaMqtt:     meta.ViaMqtt,
 		}
 		if err := waypointDAO.Upsert(waypointEntity); err != nil {
 			log.Error().Err(err).Msg("failed to save waypoint")
@@ -281,7 +281,7 @@ func (ms *MeshService) setupProcessorHandlers() {
 				"description": waypoint.Description,
 				"icon":        waypoint.Icon,
 				"from":        from,
-				"viaMqtt":     viaMqtt,
+				"viaMqtt":     meta.ViaMqtt,
 			},
 		})
 	})
