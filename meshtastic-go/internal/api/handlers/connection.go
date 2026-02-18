@@ -95,9 +95,9 @@ func (h *ConnectionHandler) GetDevices(c *gin.Context) {
 	// Devices will be sent via WebSocket
 	if connType == "ble" && streaming {
 		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 			defer cancel()
-			h.meshService.ScanDevicesStreaming(ctx, connType, 10*time.Second)
+			h.meshService.ScanDevicesStreaming(ctx, connType, 100*time.Second)
 		}()
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "scanning",

@@ -59,19 +59,14 @@ func (b *BLEInterface) Connect(ctx context.Context) error {
 	// Get the default adapter
 	b.adapter = bluetooth.DefaultAdapter
 
-	// Try to enable the adapter with retries
-	// The adapter may be in a transitional state after a scan was cancelled
-	var enableErr error
-	for i := 0; i < 3; i++ {
-		enableErr = b.adapter.Enable()
-		if enableErr == nil {
-			break
+	// Try to enable the adapter - it may already be enabled by the scanner
+	if err := b.adapter.Enable(); err != nil {
+		// "already calling Enable function" means it's already enabled, which is fine
+		if err.Error() != "already calling Enable function" {
+			log.Warn().Err(err).Msg("failed to enable BLE adapter")
+			return fmt.Errorf("failed to enable BLE adapter: %w", err)
 		}
-		log.Warn().Err(enableErr).Int("attempt", i+1).Msg("failed to enable BLE adapter, retrying")
-		time.Sleep(500 * time.Millisecond)
-	}
-	if enableErr != nil {
-		return fmt.Errorf("failed to enable BLE adapter: %w", enableErr)
+		log.Debug().Msg("BLE adapter already enabled")
 	}
 
 	// On macOS, we always need to scan to find the device

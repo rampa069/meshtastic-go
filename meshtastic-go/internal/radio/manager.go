@@ -114,8 +114,7 @@ func (m *Manager) Connect(ctx context.Context, connType ConnectionType, address 
 		if m.bleScanner.IsScanning() {
 			log.Info().Msg("cancelling BLE scan before connecting")
 			m.bleScanner.Cancel()
-			// Wait a bit for the scan to stop and release the adapter
-			time.Sleep(500 * time.Millisecond)
+			// Cancel() already waits internally for scan to stop
 		}
 	}
 
