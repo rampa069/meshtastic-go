@@ -275,17 +275,22 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo, meta protocol.Pack
 	node.Channel = int32(nodeInfo.Channel)
 	node.IsFavorite = nodeInfo.IsFavorite
 
-	// Update radio metadata from PacketMeta (has real packet data)
-	// Only update when we have real radio data (HopsAway >= 0 means HopStart > 0)
+	// Update SNR: prefer live packet data, fall back to nodeInfo (config dump has valid SNR)
+	if meta.SNR != 0 {
+		node.SNR = meta.SNR
+	} else if nodeInfo.Snr != 0 {
+		node.SNR = nodeInfo.Snr
+	}
+
+	// Update RSSI: only from live packet data (NodeInfo has no RSSI field)
+	if meta.RSSI != 0 {
+		node.RSSI = meta.RSSI
+	}
+
+	// Update hops and viaMqtt only from real radio data (HopsAway >= 0 means HopStart > 0)
 	if meta.HopsAway >= 0 {
 		node.HopsAway = meta.HopsAway
 		node.ViaMqtt = meta.ViaMqtt
-	}
-	if meta.SNR != 0 {
-		node.SNR = meta.SNR
-	}
-	if meta.RSSI != 0 {
-		node.RSSI = meta.RSSI
 	}
 
 	// Update device metrics if available
