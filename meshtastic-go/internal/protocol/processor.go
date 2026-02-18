@@ -40,13 +40,16 @@ func packetMeta(packet *pb.MeshPacket) PacketMeta {
 		SNR:      packet.RxSnr,
 		RSSI:     packet.RxRssi,
 	}
-	// Calculate hops from HopStart - HopLimit
+	// Only interpret radio metadata when HopStart > 0
+	// HopStart=0 means the packet came from serial (config dump, local node)
+	// and has no meaningful radio metrics
 	if packet.HopStart > 0 {
 		meta.HopsAway = int32(packet.HopStart - packet.HopLimit)
-	}
-	// RSSI=0 with non-zero SNR strongly indicates MQTT-relayed packet
-	if packet.RxRssi == 0 && !packet.ViaMqtt {
-		meta.ViaMqtt = true
+		// RSSI=0 on a radio packet indicates it was relayed via MQTT
+		// (real radio reception always has non-zero RSSI)
+		if packet.RxRssi == 0 && !packet.ViaMqtt {
+			meta.ViaMqtt = true
+		}
 	}
 	return meta
 }

@@ -278,12 +278,17 @@ func (nm *NodeManager) ProcessNodeInfo(nodeInfo *pb.NodeInfo) *Node {
 
 	// Update channel and other info
 	node.Channel = int32(nodeInfo.Channel)
-	node.ViaMqtt = nodeInfo.ViaMqtt
 	node.IsFavorite = nodeInfo.IsFavorite
 
-	// Set hops away from the NodeInfo
-	// The frontend will use viaMqtt flag to determine display (MQTT vs Direct)
-	node.HopsAway = int32(nodeInfo.Hops)
+	// Only update radio metadata when we have real radio data
+	// NodeInfo from serial config dump has Hops=0, Snr=0, ViaMqtt=false
+	// which would incorrectly mark all nodes as "direct"
+	if nodeInfo.Hops > 0 {
+		node.HopsAway = int32(nodeInfo.Hops)
+	}
+	if nodeInfo.Snr != 0 || nodeInfo.Hops > 0 {
+		node.ViaMqtt = nodeInfo.ViaMqtt
+	}
 
 	// Update device metrics if available
 	if nodeInfo.DeviceMetrics != nil {
