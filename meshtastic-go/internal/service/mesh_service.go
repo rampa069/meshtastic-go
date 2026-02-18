@@ -163,13 +163,31 @@ func (ms *MeshService) setupProcessorHandlers() {
 
 	// Handle traceroute responses
 	ms.processor.SetTracerouteHandler(func(from uint32, route *pb.RouteDiscovery) {
-		// Convert route to node IDs for the frontend
+		// Build route: intermediate hops (filtering out local node) + destination
+		// route.Route contains intermediate relay nodes in order, from is the destination
 		routeNodes := make([]uint32, 0, len(route.Route)+1)
-		routeNodes = append(routeNodes, from) // Add destination node
-		routeNodes = append(routeNodes, route.Route...)
+		snrTowards := make([]int32, 0, len(route.SnrTowards))
+		for i, n := range route.Route {
+			if n != ms.myNodeNum {
+				routeNodes = append(routeNodes, n)
+				if i < len(route.SnrTowards) {
+					snrTowards = append(snrTowards, route.SnrTowards[i])
+				}
+			}
+		}
+		routeNodes = append(routeNodes, from) // Destination at end
 
+		// Filter local node from return route
 		routeBackNodes := make([]uint32, 0, len(route.RouteBack))
-		routeBackNodes = append(routeBackNodes, route.RouteBack...)
+		snrBack := make([]int32, 0, len(route.SnrBack))
+		for i, n := range route.RouteBack {
+			if n != ms.myNodeNum {
+				routeBackNodes = append(routeBackNodes, n)
+				if i < len(route.SnrBack) {
+					snrBack = append(snrBack, route.SnrBack[i])
+				}
+			}
+		}
 
 		// Store traceroute in database
 		tracerouteDAO := dao.NewTracerouteDAO(ms.db.DB())
@@ -178,8 +196,8 @@ func (ms *MeshService) setupProcessorHandlers() {
 			ToNode:     from,
 			Route:      routeNodes,
 			RouteBack:  routeBackNodes,
-			SnrTowards: route.SnrTowards,
-			SnrBack:    route.SnrBack,
+			SnrTowards: snrTowards,
+			SnrBack:    snrBack,
 			HopCount:   len(routeNodes),
 			Timestamp:  time.Now().Unix(),
 			Success:    true,
@@ -196,8 +214,8 @@ func (ms *MeshService) setupProcessorHandlers() {
 				"from":       from,
 				"route":      routeNodes,
 				"routeBack":  routeBackNodes,
-				"snrTowards": route.SnrTowards,
-				"snrBack":    route.SnrBack,
+				"snrTowards": snrTowards,
+				"snrBack":    snrBack,
 			},
 		})
 	})

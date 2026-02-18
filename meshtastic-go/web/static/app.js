@@ -1853,7 +1853,31 @@ function formatLastHeard(timestamp) {
 function formatTime(timestamp) {
     if (!timestamp) return '';
     const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const now = new Date();
+    const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Same calendar day: just time
+    if (date.toDateString() === now.toDateString()) {
+        return time;
+    }
+
+    // Yesterday
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+        return `Yesterday ${time}`;
+    }
+
+    const day = date.getDate();
+    const month = date.toLocaleString([], { month: 'short' });
+
+    // Different year
+    if (date.getFullYear() !== now.getFullYear()) {
+        return `${day} ${month} ${date.getFullYear()} ${time}`;
+    }
+
+    // Same year, older than yesterday
+    return `${day} ${month} ${time}`;
 }
 
 function escapeHtml(text) {
@@ -4524,9 +4548,12 @@ function drawTracerouteOnMap(data) {
         tracerouteLines.push(arrowMarker);
     }
 
-    // Fit map to show entire route
+    // Fit map to show entire route, then center on local node
     const bounds = L.latLngBounds(coordinates.map(c => [c.lat, c.lon]));
     leafletMap.fitBounds(bounds, { padding: [50, 50] });
+    if (myNode?.latitude && myNode?.longitude) {
+        leafletMap.setView([myNode.latitude, myNode.longitude], leafletMap.getZoom());
+    }
 
     // Add legend for traceroute
     addTracerouteLegend();
