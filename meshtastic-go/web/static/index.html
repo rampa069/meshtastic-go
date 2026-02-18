@@ -75,7 +75,8 @@
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--background);
             color: var(--on-surface);
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
         /* Header */
@@ -201,6 +202,7 @@
             display: grid;
             grid-template-columns: 300px 1fr 320px;
             height: calc(100vh - 56px);
+            overflow: hidden;
         }
 
         /* Sidebar */
@@ -209,6 +211,8 @@
             border-right: 1px solid var(--outline-variant);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
         }
 
         .sidebar-header {
@@ -1259,6 +1263,7 @@
             border-left: 1px solid var(--outline-variant);
             padding: 1rem;
             overflow-y: auto;
+            min-height: 0;
         }
 
         .panel-section {
