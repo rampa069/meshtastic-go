@@ -115,11 +115,11 @@ func (x TelemetrySensorType) String() string {
 
 // DeviceMetrics contains device telemetry data.
 type DeviceMetrics struct {
-	BatteryLevel       uint32  `protobuf:"varint,1,opt,name=battery_level,json=batteryLevel,proto3" json:"battery_level,omitempty"`
+	BatteryLevel       uint32  `protobuf:"varint,1,opt,name=battery_level,json=batteryLevel,proto3" json:"batteryLevel,omitempty"`
 	Voltage            float32 `protobuf:"fixed32,2,opt,name=voltage,proto3" json:"voltage,omitempty"`
-	ChannelUtilization float32 `protobuf:"fixed32,3,opt,name=channel_utilization,json=channelUtilization,proto3" json:"channel_utilization,omitempty"`
-	AirUtilTx          float32 `protobuf:"fixed32,4,opt,name=air_util_tx,json=airUtilTx,proto3" json:"air_util_tx,omitempty"`
-	UptimeSeconds      uint32  `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	ChannelUtilization float32 `protobuf:"fixed32,3,opt,name=channel_utilization,json=channelUtilization,proto3" json:"channelUtilization,omitempty"`
+	AirUtilTx          float32 `protobuf:"fixed32,4,opt,name=air_util_tx,json=airUtilTx,proto3" json:"airUtilTx,omitempty"`
+	UptimeSeconds      uint32  `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptimeSeconds,omitempty"`
 }
 
 func (d *DeviceMetrics) Reset() { *d = DeviceMetrics{} }
@@ -128,26 +128,26 @@ func (d *DeviceMetrics) ProtoMessage() {}
 // EnvironmentMetrics contains environmental sensor data.
 type EnvironmentMetrics struct {
 	Temperature         float32 `protobuf:"fixed32,1,opt,name=temperature,proto3" json:"temperature,omitempty"`
-	RelativeHumidity    float32 `protobuf:"fixed32,2,opt,name=relative_humidity,json=relativeHumidity,proto3" json:"relative_humidity,omitempty"`
-	BarometricPressure  float32 `protobuf:"fixed32,3,opt,name=barometric_pressure,json=barometricPressure,proto3" json:"barometric_pressure,omitempty"`
-	GasResistance       float32 `protobuf:"fixed32,4,opt,name=gas_resistance,json=gasResistance,proto3" json:"gas_resistance,omitempty"`
+	RelativeHumidity    float32 `protobuf:"fixed32,2,opt,name=relative_humidity,json=relativeHumidity,proto3" json:"relativeHumidity,omitempty"`
+	BarometricPressure  float32 `protobuf:"fixed32,3,opt,name=barometric_pressure,json=barometricPressure,proto3" json:"barometricPressure,omitempty"`
+	GasResistance       float32 `protobuf:"fixed32,4,opt,name=gas_resistance,json=gasResistance,proto3" json:"gasResistance,omitempty"`
 	Voltage             float32 `protobuf:"fixed32,5,opt,name=voltage,proto3" json:"voltage,omitempty"`
 	Current             float32 `protobuf:"fixed32,6,opt,name=current,proto3" json:"current,omitempty"`
 	Iaq                 uint32  `protobuf:"varint,7,opt,name=iaq,proto3" json:"iaq,omitempty"`
 	Distance            float32 `protobuf:"fixed32,8,opt,name=distance,proto3" json:"distance,omitempty"`
 	Lux                 float32 `protobuf:"fixed32,9,opt,name=lux,proto3" json:"lux,omitempty"`
-	WhiteLux            float32 `protobuf:"fixed32,10,opt,name=white_lux,json=whiteLux,proto3" json:"white_lux,omitempty"`
-	IrLux               float32 `protobuf:"fixed32,11,opt,name=ir_lux,json=irLux,proto3" json:"ir_lux,omitempty"`
-	UvLux               float32 `protobuf:"fixed32,12,opt,name=uv_lux,json=uvLux,proto3" json:"uv_lux,omitempty"`
-	WindDirection       uint32  `protobuf:"varint,13,opt,name=wind_direction,json=windDirection,proto3" json:"wind_direction,omitempty"`
-	WindSpeed           float32 `protobuf:"fixed32,14,opt,name=wind_speed,json=windSpeed,proto3" json:"wind_speed,omitempty"`
+	WhiteLux            float32 `protobuf:"fixed32,10,opt,name=white_lux,json=whiteLux,proto3" json:"whiteLux,omitempty"`
+	IrLux               float32 `protobuf:"fixed32,11,opt,name=ir_lux,json=irLux,proto3" json:"irLux,omitempty"`
+	UvLux               float32 `protobuf:"fixed32,12,opt,name=uv_lux,json=uvLux,proto3" json:"uvLux,omitempty"`
+	WindDirection       uint32  `protobuf:"varint,13,opt,name=wind_direction,json=windDirection,proto3" json:"windDirection,omitempty"`
+	WindSpeed           float32 `protobuf:"fixed32,14,opt,name=wind_speed,json=windSpeed,proto3" json:"windSpeed,omitempty"`
 	Weight              float32 `protobuf:"fixed32,15,opt,name=weight,proto3" json:"weight,omitempty"`
-	WindGust            float32 `protobuf:"fixed32,16,opt,name=wind_gust,json=windGust,proto3" json:"wind_gust,omitempty"`
-	WindLull            float32 `protobuf:"fixed32,17,opt,name=wind_lull,json=windLull,proto3" json:"wind_lull,omitempty"`
+	WindGust            float32 `protobuf:"fixed32,16,opt,name=wind_gust,json=windGust,proto3" json:"windGust,omitempty"`
+	WindLull            float32 `protobuf:"fixed32,17,opt,name=wind_lull,json=windLull,proto3" json:"windLull,omitempty"`
 	Radiation           float32 `protobuf:"fixed32,18,opt,name=radiation,proto3" json:"radiation,omitempty"`
 	Rainfall            float32 `protobuf:"fixed32,19,opt,name=rainfall,proto3" json:"rainfall,omitempty"`
-	SoilMoisture        float32 `protobuf:"fixed32,20,opt,name=soil_moisture,json=soilMoisture,proto3" json:"soil_moisture,omitempty"`
-	SoilTemperature     float32 `protobuf:"fixed32,21,opt,name=soil_temperature,json=soilTemperature,proto3" json:"soil_temperature,omitempty"`
+	SoilMoisture        float32 `protobuf:"fixed32,20,opt,name=soil_moisture,json=soilMoisture,proto3" json:"soilMoisture,omitempty"`
+	SoilTemperature     float32 `protobuf:"fixed32,21,opt,name=soil_temperature,json=soilTemperature,proto3" json:"soilTemperature,omitempty"`
 }
 
 func (e *EnvironmentMetrics) Reset() { *e = EnvironmentMetrics{} }
@@ -155,12 +155,12 @@ func (e *EnvironmentMetrics) ProtoMessage() {}
 
 // PowerMetrics contains power monitoring data.
 type PowerMetrics struct {
-	Ch1Voltage float32 `protobuf:"fixed32,1,opt,name=ch1_voltage,json=ch1Voltage,proto3" json:"ch1_voltage,omitempty"`
-	Ch1Current float32 `protobuf:"fixed32,2,opt,name=ch1_current,json=ch1Current,proto3" json:"ch1_current,omitempty"`
-	Ch2Voltage float32 `protobuf:"fixed32,3,opt,name=ch2_voltage,json=ch2Voltage,proto3" json:"ch2_voltage,omitempty"`
-	Ch2Current float32 `protobuf:"fixed32,4,opt,name=ch2_current,json=ch2Current,proto3" json:"ch2_current,omitempty"`
-	Ch3Voltage float32 `protobuf:"fixed32,5,opt,name=ch3_voltage,json=ch3Voltage,proto3" json:"ch3_voltage,omitempty"`
-	Ch3Current float32 `protobuf:"fixed32,6,opt,name=ch3_current,json=ch3Current,proto3" json:"ch3_current,omitempty"`
+	Ch1Voltage float32 `protobuf:"fixed32,1,opt,name=ch1_voltage,json=ch1Voltage,proto3" json:"ch1Voltage,omitempty"`
+	Ch1Current float32 `protobuf:"fixed32,2,opt,name=ch1_current,json=ch1Current,proto3" json:"ch1Current,omitempty"`
+	Ch2Voltage float32 `protobuf:"fixed32,3,opt,name=ch2_voltage,json=ch2Voltage,proto3" json:"ch2Voltage,omitempty"`
+	Ch2Current float32 `protobuf:"fixed32,4,opt,name=ch2_current,json=ch2Current,proto3" json:"ch2Current,omitempty"`
+	Ch3Voltage float32 `protobuf:"fixed32,5,opt,name=ch3_voltage,json=ch3Voltage,proto3" json:"ch3Voltage,omitempty"`
+	Ch3Current float32 `protobuf:"fixed32,6,opt,name=ch3_current,json=ch3Current,proto3" json:"ch3Current,omitempty"`
 }
 
 func (p *PowerMetrics) Reset() { *p = PowerMetrics{} }
@@ -168,18 +168,18 @@ func (p *PowerMetrics) ProtoMessage() {}
 
 // AirQualityMetrics contains air quality sensor data.
 type AirQualityMetrics struct {
-	Pm10Standard  uint32 `protobuf:"varint,1,opt,name=pm10_standard,json=pm10Standard,proto3" json:"pm10_standard,omitempty"`
-	Pm25Standard  uint32 `protobuf:"varint,2,opt,name=pm25_standard,json=pm25Standard,proto3" json:"pm25_standard,omitempty"`
-	Pm100Standard uint32 `protobuf:"varint,3,opt,name=pm100_standard,json=pm100Standard,proto3" json:"pm100_standard,omitempty"`
-	Pm10Environmental  uint32 `protobuf:"varint,4,opt,name=pm10_environmental,json=pm10Environmental,proto3" json:"pm10_environmental,omitempty"`
-	Pm25Environmental  uint32 `protobuf:"varint,5,opt,name=pm25_environmental,json=pm25Environmental,proto3" json:"pm25_environmental,omitempty"`
-	Pm100Environmental uint32 `protobuf:"varint,6,opt,name=pm100_environmental,json=pm100Environmental,proto3" json:"pm100_environmental,omitempty"`
-	Particles03um uint32 `protobuf:"varint,7,opt,name=particles_03um,json=particles03um,proto3" json:"particles_03um,omitempty"`
-	Particles05um uint32 `protobuf:"varint,8,opt,name=particles_05um,json=particles05um,proto3" json:"particles_05um,omitempty"`
-	Particles10um uint32 `protobuf:"varint,9,opt,name=particles_10um,json=particles10um,proto3" json:"particles_10um,omitempty"`
-	Particles25um uint32 `protobuf:"varint,10,opt,name=particles_25um,json=particles25um,proto3" json:"particles_25um,omitempty"`
-	Particles50um uint32 `protobuf:"varint,11,opt,name=particles_50um,json=particles50um,proto3" json:"particles_50um,omitempty"`
-	Particles100um uint32 `protobuf:"varint,12,opt,name=particles_100um,json=particles100um,proto3" json:"particles_100um,omitempty"`
+	Pm10Standard  uint32 `protobuf:"varint,1,opt,name=pm10_standard,json=pm10Standard,proto3" json:"pm10Standard,omitempty"`
+	Pm25Standard  uint32 `protobuf:"varint,2,opt,name=pm25_standard,json=pm25Standard,proto3" json:"pm25Standard,omitempty"`
+	Pm100Standard uint32 `protobuf:"varint,3,opt,name=pm100_standard,json=pm100Standard,proto3" json:"pm100Standard,omitempty"`
+	Pm10Environmental  uint32 `protobuf:"varint,4,opt,name=pm10_environmental,json=pm10Environmental,proto3" json:"pm10Environmental,omitempty"`
+	Pm25Environmental  uint32 `protobuf:"varint,5,opt,name=pm25_environmental,json=pm25Environmental,proto3" json:"pm25Environmental,omitempty"`
+	Pm100Environmental uint32 `protobuf:"varint,6,opt,name=pm100_environmental,json=pm100Environmental,proto3" json:"pm100Environmental,omitempty"`
+	Particles03um uint32 `protobuf:"varint,7,opt,name=particles_03um,json=particles03um,proto3" json:"particles03um,omitempty"`
+	Particles05um uint32 `protobuf:"varint,8,opt,name=particles_05um,json=particles05um,proto3" json:"particles05um,omitempty"`
+	Particles10um uint32 `protobuf:"varint,9,opt,name=particles_10um,json=particles10um,proto3" json:"particles10um,omitempty"`
+	Particles25um uint32 `protobuf:"varint,10,opt,name=particles_25um,json=particles25um,proto3" json:"particles25um,omitempty"`
+	Particles50um uint32 `protobuf:"varint,11,opt,name=particles_50um,json=particles50um,proto3" json:"particles50um,omitempty"`
+	Particles100um uint32 `protobuf:"varint,12,opt,name=particles_100um,json=particles100um,proto3" json:"particles100um,omitempty"`
 	Co2           uint32 `protobuf:"varint,13,opt,name=co2,proto3" json:"co2,omitempty"`
 }
 
@@ -188,17 +188,17 @@ func (a *AirQualityMetrics) ProtoMessage() {}
 
 // LocalStats contains local device statistics.
 type LocalStats struct {
-	UptimeSeconds        uint32 `protobuf:"varint,1,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
-	ChannelUtilization   float32 `protobuf:"fixed32,2,opt,name=channel_utilization,json=channelUtilization,proto3" json:"channel_utilization,omitempty"`
-	AirUtilTx            float32 `protobuf:"fixed32,3,opt,name=air_util_tx,json=airUtilTx,proto3" json:"air_util_tx,omitempty"`
-	NumPacketsTx         uint32 `protobuf:"varint,4,opt,name=num_packets_tx,json=numPacketsTx,proto3" json:"num_packets_tx,omitempty"`
-	NumPacketsRx         uint32 `protobuf:"varint,5,opt,name=num_packets_rx,json=numPacketsRx,proto3" json:"num_packets_rx,omitempty"`
-	NumPacketsRxBad      uint32 `protobuf:"varint,6,opt,name=num_packets_rx_bad,json=numPacketsRxBad,proto3" json:"num_packets_rx_bad,omitempty"`
-	NumOnlineNodes       uint32 `protobuf:"varint,7,opt,name=num_online_nodes,json=numOnlineNodes,proto3" json:"num_online_nodes,omitempty"`
-	NumTotalNodes        uint32 `protobuf:"varint,8,opt,name=num_total_nodes,json=numTotalNodes,proto3" json:"num_total_nodes,omitempty"`
-	NumRxDupe            uint32 `protobuf:"varint,9,opt,name=num_rx_dupe,json=numRxDupe,proto3" json:"num_rx_dupe,omitempty"`
-	NumTxRelay           uint32 `protobuf:"varint,10,opt,name=num_tx_relay,json=numTxRelay,proto3" json:"num_tx_relay,omitempty"`
-	NumTxRelayCanceled   uint32 `protobuf:"varint,11,opt,name=num_tx_relay_canceled,json=numTxRelayCanceled,proto3" json:"num_tx_relay_canceled,omitempty"`
+	UptimeSeconds        uint32 `protobuf:"varint,1,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptimeSeconds,omitempty"`
+	ChannelUtilization   float32 `protobuf:"fixed32,2,opt,name=channel_utilization,json=channelUtilization,proto3" json:"channelUtilization,omitempty"`
+	AirUtilTx            float32 `protobuf:"fixed32,3,opt,name=air_util_tx,json=airUtilTx,proto3" json:"airUtilTx,omitempty"`
+	NumPacketsTx         uint32 `protobuf:"varint,4,opt,name=num_packets_tx,json=numPacketsTx,proto3" json:"numPacketsTx,omitempty"`
+	NumPacketsRx         uint32 `protobuf:"varint,5,opt,name=num_packets_rx,json=numPacketsRx,proto3" json:"numPacketsRx,omitempty"`
+	NumPacketsRxBad      uint32 `protobuf:"varint,6,opt,name=num_packets_rx_bad,json=numPacketsRxBad,proto3" json:"numPacketsRxBad,omitempty"`
+	NumOnlineNodes       uint32 `protobuf:"varint,7,opt,name=num_online_nodes,json=numOnlineNodes,proto3" json:"numOnlineNodes,omitempty"`
+	NumTotalNodes        uint32 `protobuf:"varint,8,opt,name=num_total_nodes,json=numTotalNodes,proto3" json:"numTotalNodes,omitempty"`
+	NumRxDupe            uint32 `protobuf:"varint,9,opt,name=num_rx_dupe,json=numRxDupe,proto3" json:"numRxDupe,omitempty"`
+	NumTxRelay           uint32 `protobuf:"varint,10,opt,name=num_tx_relay,json=numTxRelay,proto3" json:"numTxRelay,omitempty"`
+	NumTxRelayCanceled   uint32 `protobuf:"varint,11,opt,name=num_tx_relay_canceled,json=numTxRelayCanceled,proto3" json:"numTxRelayCanceled,omitempty"`
 }
 
 func (l *LocalStats) Reset() { *l = LocalStats{} }
@@ -206,7 +206,7 @@ func (l *LocalStats) ProtoMessage() {}
 
 // HealthMetrics contains health telemetry data.
 type HealthMetrics struct {
-	HeartBpm         uint32  `protobuf:"varint,1,opt,name=heart_bpm,json=heartBpm,proto3" json:"heart_bpm,omitempty"`
+	HeartBpm         uint32  `protobuf:"varint,1,opt,name=heart_bpm,json=heartBpm,proto3" json:"heartBpm,omitempty"`
 	Spout            uint32  `protobuf:"varint,2,opt,name=spout,proto3" json:"spout,omitempty"`
 	Temperature      float32 `protobuf:"fixed32,3,opt,name=temperature,proto3" json:"temperature,omitempty"`
 }

@@ -83,10 +83,10 @@ func (x AdminMessage_ModuleConfigType) String() string {
 
 // HamParameters contains amateur radio license parameters.
 type HamParameters struct {
-	CallSign       string `protobuf:"bytes,1,opt,name=call_sign,json=callSign,proto3" json:"call_sign,omitempty"`
-	TxPower        int32  `protobuf:"varint,2,opt,name=tx_power,json=txPower,proto3" json:"tx_power,omitempty"`
+	CallSign       string `protobuf:"bytes,1,opt,name=call_sign,json=callSign,proto3" json:"callSign,omitempty"`
+	TxPower        int32  `protobuf:"varint,2,opt,name=tx_power,json=txPower,proto3" json:"txPower,omitempty"`
 	Frequency      float32 `protobuf:"fixed32,3,opt,name=frequency,proto3" json:"frequency,omitempty"`
-	ShortName      string `protobuf:"bytes,4,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
+	ShortName      string `protobuf:"bytes,4,opt,name=short_name,json=shortName,proto3" json:"shortName,omitempty"`
 }
 
 func (h *HamParameters) Reset() { *h = HamParameters{} }
@@ -94,7 +94,7 @@ func (h *HamParameters) ProtoMessage() {}
 
 // NodeRemoteHardwarePin represents a remote hardware pin on a specific node.
 type NodeRemoteHardwarePin struct {
-	NodeNum uint32             `protobuf:"varint,1,opt,name=node_num,json=nodeNum,proto3" json:"node_num,omitempty"`
+	NodeNum uint32             `protobuf:"varint,1,opt,name=node_num,json=nodeNum,proto3" json:"nodeNum,omitempty"`
 	Pin     *RemoteHardwarePin `protobuf:"bytes,2,opt,name=pin,proto3" json:"pin,omitempty"`
 }
 
@@ -104,7 +104,7 @@ func (n *NodeRemoteHardwarePin) ProtoMessage() {}
 // AdminMessage is the main admin message envelope.
 type AdminMessage struct {
 	// Session passkey for security (expires after 300 seconds)
-	SessionPasskey []byte `protobuf:"bytes,101,opt,name=session_passkey,json=sessionPasskey,proto3" json:"session_passkey,omitempty"`
+	SessionPasskey []byte `protobuf:"bytes,101,opt,name=session_passkey,json=sessionPasskey,proto3" json:"sessionPasskey,omitempty"`
 
 	// Types that are valid to be assigned to PayloadVariant:
 	//	*AdminMessage_GetConfigRequest
@@ -382,7 +382,7 @@ func (a *AdminMessage) ProtoMessage() {}
 
 // NodeRemoteHardwarePinsResponse contains the response for remote hardware pins request.
 type NodeRemoteHardwarePinsResponse struct {
-	NodeRemoteHardwarePins []*NodeRemoteHardwarePin `protobuf:"bytes,1,rep,name=node_remote_hardware_pins,json=nodeRemoteHardwarePins,proto3" json:"node_remote_hardware_pins,omitempty"`
+	NodeRemoteHardwarePins []*NodeRemoteHardwarePin `protobuf:"bytes,1,rep,name=node_remote_hardware_pins,json=nodeRemoteHardwarePins,proto3" json:"nodeRemoteHardwarePins,omitempty"`
 }
 
 func (n *NodeRemoteHardwarePinsResponse) Reset() { *n = NodeRemoteHardwarePinsResponse{} }

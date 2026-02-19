@@ -151,17 +151,17 @@ const (
 // DeviceConfig contains device-specific settings.
 type Config_DeviceConfig struct {
 	Role                      Config_DeviceConfig_Role `protobuf:"varint,1,opt,name=role,proto3,enum=meshtastic.Config_DeviceConfig_Role" json:"role,omitempty"`
-	SerialEnabled             bool   `protobuf:"varint,2,opt,name=serial_enabled,json=serialEnabled,proto3" json:"serial_enabled,omitempty"`
-	DebugLogEnabled           bool   `protobuf:"varint,3,opt,name=debug_log_enabled,json=debugLogEnabled,proto3" json:"debug_log_enabled,omitempty"`
-	ButtonGpio                uint32 `protobuf:"varint,4,opt,name=button_gpio,json=buttonGpio,proto3" json:"button_gpio,omitempty"`
-	BuzzerGpio                uint32 `protobuf:"varint,5,opt,name=buzzer_gpio,json=buzzerGpio,proto3" json:"buzzer_gpio,omitempty"`
-	RebroadcastMode           uint32 `protobuf:"varint,6,opt,name=rebroadcast_mode,json=rebroadcastMode,proto3" json:"rebroadcast_mode,omitempty"`
-	NodeInfoBroadcastSecs     uint32 `protobuf:"varint,7,opt,name=node_info_broadcast_secs,json=nodeInfoBroadcastSecs,proto3" json:"node_info_broadcast_secs,omitempty"`
-	DoubleTapAsButtonPress    bool   `protobuf:"varint,8,opt,name=double_tap_as_button_press,json=doubleTapAsButtonPress,proto3" json:"double_tap_as_button_press,omitempty"`
-	IsManaged                 bool   `protobuf:"varint,9,opt,name=is_managed,json=isManaged,proto3" json:"is_managed,omitempty"`
-	DisableTripleClick        bool   `protobuf:"varint,10,opt,name=disable_triple_click,json=disableTripleClick,proto3" json:"disable_triple_click,omitempty"`
+	SerialEnabled             bool   `protobuf:"varint,2,opt,name=serial_enabled,json=serialEnabled,proto3" json:"serialEnabled,omitempty"`
+	DebugLogEnabled           bool   `protobuf:"varint,3,opt,name=debug_log_enabled,json=debugLogEnabled,proto3" json:"debugLogEnabled,omitempty"`
+	ButtonGpio                uint32 `protobuf:"varint,4,opt,name=button_gpio,json=buttonGpio,proto3" json:"buttonGpio,omitempty"`
+	BuzzerGpio                uint32 `protobuf:"varint,5,opt,name=buzzer_gpio,json=buzzerGpio,proto3" json:"buzzerGpio,omitempty"`
+	RebroadcastMode           uint32 `protobuf:"varint,6,opt,name=rebroadcast_mode,json=rebroadcastMode,proto3" json:"rebroadcastMode,omitempty"`
+	NodeInfoBroadcastSecs     uint32 `protobuf:"varint,7,opt,name=node_info_broadcast_secs,json=nodeInfoBroadcastSecs,proto3" json:"nodeInfoBroadcastSecs,omitempty"`
+	DoubleTapAsButtonPress    bool   `protobuf:"varint,8,opt,name=double_tap_as_button_press,json=doubleTapAsButtonPress,proto3" json:"doubleTapAsButtonPress,omitempty"`
+	IsManaged                 bool   `protobuf:"varint,9,opt,name=is_managed,json=isManaged,proto3" json:"isManaged,omitempty"`
+	DisableTripleClick        bool   `protobuf:"varint,10,opt,name=disable_triple_click,json=disableTripleClick,proto3" json:"disableTripleClick,omitempty"`
 	Tzdef                     string `protobuf:"bytes,11,opt,name=tzdef,proto3" json:"tzdef,omitempty"`
-	LedHeartbeatDisabled      bool   `protobuf:"varint,12,opt,name=led_heartbeat_disabled,json=ledHeartbeatDisabled,proto3" json:"led_heartbeat_disabled,omitempty"`
+	LedHeartbeatDisabled      bool   `protobuf:"varint,12,opt,name=led_heartbeat_disabled,json=ledHeartbeatDisabled,proto3" json:"ledHeartbeatDisabled,omitempty"`
 }
 
 func (c *Config_DeviceConfig) Reset() { *c = Config_DeviceConfig{} }
@@ -169,18 +169,18 @@ func (c *Config_DeviceConfig) ProtoMessage() {}
 
 // PositionConfig contains GPS and position settings.
 type Config_PositionConfig struct {
-	PositionBroadcastSecs     uint32 `protobuf:"varint,1,opt,name=position_broadcast_secs,json=positionBroadcastSecs,proto3" json:"position_broadcast_secs,omitempty"`
-	PositionBroadcastSmartEnabled bool `protobuf:"varint,2,opt,name=position_broadcast_smart_enabled,json=positionBroadcastSmartEnabled,proto3" json:"position_broadcast_smart_enabled,omitempty"`
-	FixedPosition             bool   `protobuf:"varint,3,opt,name=fixed_position,json=fixedPosition,proto3" json:"fixed_position,omitempty"`
-	GpsEnabled                bool   `protobuf:"varint,4,opt,name=gps_enabled,json=gpsEnabled,proto3" json:"gps_enabled,omitempty"`
-	GpsUpdateInterval         uint32 `protobuf:"varint,5,opt,name=gps_update_interval,json=gpsUpdateInterval,proto3" json:"gps_update_interval,omitempty"`
-	GpsAttemptTime            uint32 `protobuf:"varint,6,opt,name=gps_attempt_time,json=gpsAttemptTime,proto3" json:"gps_attempt_time,omitempty"`
-	PositionFlags             uint32 `protobuf:"varint,7,opt,name=position_flags,json=positionFlags,proto3" json:"position_flags,omitempty"`
-	RxGpio                    uint32 `protobuf:"varint,8,opt,name=rx_gpio,json=rxGpio,proto3" json:"rx_gpio,omitempty"`
-	TxGpio                    uint32 `protobuf:"varint,9,opt,name=tx_gpio,json=txGpio,proto3" json:"tx_gpio,omitempty"`
-	BroadcastSmartMinimumDistance uint32 `protobuf:"varint,10,opt,name=broadcast_smart_minimum_distance,json=broadcastSmartMinimumDistance,proto3" json:"broadcast_smart_minimum_distance,omitempty"`
-	BroadcastSmartMinimumIntervalSecs uint32 `protobuf:"varint,11,opt,name=broadcast_smart_minimum_interval_secs,json=broadcastSmartMinimumIntervalSecs,proto3" json:"broadcast_smart_minimum_interval_secs,omitempty"`
-	GpsMode                   uint32 `protobuf:"varint,12,opt,name=gps_mode,json=gpsMode,proto3" json:"gps_mode,omitempty"`
+	PositionBroadcastSecs     uint32 `protobuf:"varint,1,opt,name=position_broadcast_secs,json=positionBroadcastSecs,proto3" json:"positionBroadcastSecs,omitempty"`
+	PositionBroadcastSmartEnabled bool `protobuf:"varint,2,opt,name=position_broadcast_smart_enabled,json=positionBroadcastSmartEnabled,proto3" json:"positionBroadcastSmartEnabled,omitempty"`
+	FixedPosition             bool   `protobuf:"varint,3,opt,name=fixed_position,json=fixedPosition,proto3" json:"fixedPosition,omitempty"`
+	GpsEnabled                bool   `protobuf:"varint,4,opt,name=gps_enabled,json=gpsEnabled,proto3" json:"gpsEnabled,omitempty"`
+	GpsUpdateInterval         uint32 `protobuf:"varint,5,opt,name=gps_update_interval,json=gpsUpdateInterval,proto3" json:"gpsUpdateInterval,omitempty"`
+	GpsAttemptTime            uint32 `protobuf:"varint,6,opt,name=gps_attempt_time,json=gpsAttemptTime,proto3" json:"gpsAttemptTime,omitempty"`
+	PositionFlags             uint32 `protobuf:"varint,7,opt,name=position_flags,json=positionFlags,proto3" json:"positionFlags,omitempty"`
+	RxGpio                    uint32 `protobuf:"varint,8,opt,name=rx_gpio,json=rxGpio,proto3" json:"rxGpio,omitempty"`
+	TxGpio                    uint32 `protobuf:"varint,9,opt,name=tx_gpio,json=txGpio,proto3" json:"txGpio,omitempty"`
+	BroadcastSmartMinimumDistance uint32 `protobuf:"varint,10,opt,name=broadcast_smart_minimum_distance,json=broadcastSmartMinimumDistance,proto3" json:"broadcastSmartMinimumDistance,omitempty"`
+	BroadcastSmartMinimumIntervalSecs uint32 `protobuf:"varint,11,opt,name=broadcast_smart_minimum_interval_secs,json=broadcastSmartMinimumIntervalSecs,proto3" json:"broadcastSmartMinimumIntervalSecs,omitempty"`
+	GpsMode                   uint32 `protobuf:"varint,12,opt,name=gps_mode,json=gpsMode,proto3" json:"gpsMode,omitempty"`
 }
 
 func (c *Config_PositionConfig) Reset() { *c = Config_PositionConfig{} }
@@ -188,15 +188,15 @@ func (c *Config_PositionConfig) ProtoMessage() {}
 
 // PowerConfig contains power management settings.
 type Config_PowerConfig struct {
-	IsPowerSaving            bool   `protobuf:"varint,1,opt,name=is_power_saving,json=isPowerSaving,proto3" json:"is_power_saving,omitempty"`
-	OnBatteryShutdownAfterSecs uint32 `protobuf:"varint,2,opt,name=on_battery_shutdown_after_secs,json=onBatteryShutdownAfterSecs,proto3" json:"on_battery_shutdown_after_secs,omitempty"`
-	AdcMultiplierOverride    float32 `protobuf:"fixed32,3,opt,name=adc_multiplier_override,json=adcMultiplierOverride,proto3" json:"adc_multiplier_override,omitempty"`
-	WaitBluetoothSecs        uint32 `protobuf:"varint,4,opt,name=wait_bluetooth_secs,json=waitBluetoothSecs,proto3" json:"wait_bluetooth_secs,omitempty"`
-	SdsSecs                  uint32 `protobuf:"varint,6,opt,name=sds_secs,json=sdsSecs,proto3" json:"sds_secs,omitempty"`
-	LsSecs                   uint32 `protobuf:"varint,7,opt,name=ls_secs,json=lsSecs,proto3" json:"ls_secs,omitempty"`
-	MinWakeSecs              uint32 `protobuf:"varint,8,opt,name=min_wake_secs,json=minWakeSecs,proto3" json:"min_wake_secs,omitempty"`
-	DeviceBatteryInaAddress  uint32 `protobuf:"varint,9,opt,name=device_battery_ina_address,json=deviceBatteryInaAddress,proto3" json:"device_battery_ina_address,omitempty"`
-	PowermonEnables          uint64 `protobuf:"varint,10,opt,name=powermon_enables,json=powermonEnables,proto3" json:"powermon_enables,omitempty"`
+	IsPowerSaving            bool   `protobuf:"varint,1,opt,name=is_power_saving,json=isPowerSaving,proto3" json:"isPowerSaving,omitempty"`
+	OnBatteryShutdownAfterSecs uint32 `protobuf:"varint,2,opt,name=on_battery_shutdown_after_secs,json=onBatteryShutdownAfterSecs,proto3" json:"onBatteryShutdownAfterSecs,omitempty"`
+	AdcMultiplierOverride    float32 `protobuf:"fixed32,3,opt,name=adc_multiplier_override,json=adcMultiplierOverride,proto3" json:"adcMultiplierOverride,omitempty"`
+	WaitBluetoothSecs        uint32 `protobuf:"varint,4,opt,name=wait_bluetooth_secs,json=waitBluetoothSecs,proto3" json:"waitBluetoothSecs,omitempty"`
+	SdsSecs                  uint32 `protobuf:"varint,6,opt,name=sds_secs,json=sdsSecs,proto3" json:"sdsSecs,omitempty"`
+	LsSecs                   uint32 `protobuf:"varint,7,opt,name=ls_secs,json=lsSecs,proto3" json:"lsSecs,omitempty"`
+	MinWakeSecs              uint32 `protobuf:"varint,8,opt,name=min_wake_secs,json=minWakeSecs,proto3" json:"minWakeSecs,omitempty"`
+	DeviceBatteryInaAddress  uint32 `protobuf:"varint,9,opt,name=device_battery_ina_address,json=deviceBatteryInaAddress,proto3" json:"deviceBatteryInaAddress,omitempty"`
+	PowermonEnables          uint64 `protobuf:"varint,10,opt,name=powermon_enables,json=powermonEnables,proto3" json:"powermonEnables,omitempty"`
 }
 
 func (c *Config_PowerConfig) Reset() { *c = Config_PowerConfig{} }
@@ -204,14 +204,14 @@ func (c *Config_PowerConfig) ProtoMessage() {}
 
 // NetworkConfig contains network settings.
 type Config_NetworkConfig struct {
-	WifiEnabled       bool   `protobuf:"varint,1,opt,name=wifi_enabled,json=wifiEnabled,proto3" json:"wifi_enabled,omitempty"`
-	WifiSsid          string `protobuf:"bytes,3,opt,name=wifi_ssid,json=wifiSsid,proto3" json:"wifi_ssid,omitempty"`
-	WifiPsk           string `protobuf:"bytes,4,opt,name=wifi_psk,json=wifiPsk,proto3" json:"wifi_psk,omitempty"`
-	NtpServer         string `protobuf:"bytes,5,opt,name=ntp_server,json=ntpServer,proto3" json:"ntp_server,omitempty"`
-	EthEnabled        bool   `protobuf:"varint,6,opt,name=eth_enabled,json=ethEnabled,proto3" json:"eth_enabled,omitempty"`
-	AddressMode       uint32 `protobuf:"varint,7,opt,name=address_mode,json=addressMode,proto3" json:"address_mode,omitempty"`
-	Ipv4Config        *Config_NetworkConfig_IpV4Config `protobuf:"bytes,8,opt,name=ipv4_config,json=ipv4Config,proto3" json:"ipv4_config,omitempty"`
-	RsyslogServer     string `protobuf:"bytes,9,opt,name=rsyslog_server,json=rsyslogServer,proto3" json:"rsyslog_server,omitempty"`
+	WifiEnabled       bool   `protobuf:"varint,1,opt,name=wifi_enabled,json=wifiEnabled,proto3" json:"wifiEnabled,omitempty"`
+	WifiSsid          string `protobuf:"bytes,3,opt,name=wifi_ssid,json=wifiSsid,proto3" json:"wifiSsid,omitempty"`
+	WifiPsk           string `protobuf:"bytes,4,opt,name=wifi_psk,json=wifiPsk,proto3" json:"wifiPsk,omitempty"`
+	NtpServer         string `protobuf:"bytes,5,opt,name=ntp_server,json=ntpServer,proto3" json:"ntpServer,omitempty"`
+	EthEnabled        bool   `protobuf:"varint,6,opt,name=eth_enabled,json=ethEnabled,proto3" json:"ethEnabled,omitempty"`
+	AddressMode       uint32 `protobuf:"varint,7,opt,name=address_mode,json=addressMode,proto3" json:"addressMode,omitempty"`
+	Ipv4Config        *Config_NetworkConfig_IpV4Config `protobuf:"bytes,8,opt,name=ipv4_config,json=ipv4Config,proto3" json:"ipv4Config,omitempty"`
+	RsyslogServer     string `protobuf:"bytes,9,opt,name=rsyslog_server,json=rsyslogServer,proto3" json:"rsyslogServer,omitempty"`
 }
 
 func (c *Config_NetworkConfig) Reset() { *c = Config_NetworkConfig{} }
@@ -230,17 +230,17 @@ func (c *Config_NetworkConfig_IpV4Config) ProtoMessage() {}
 
 // DisplayConfig contains display settings.
 type Config_DisplayConfig struct {
-	ScreenOnSecs       uint32 `protobuf:"varint,1,opt,name=screen_on_secs,json=screenOnSecs,proto3" json:"screen_on_secs,omitempty"`
-	GpsFormat          uint32 `protobuf:"varint,2,opt,name=gps_format,json=gpsFormat,proto3" json:"gps_format,omitempty"`
-	AutoScreenCarouselSecs uint32 `protobuf:"varint,3,opt,name=auto_screen_carousel_secs,json=autoScreenCarouselSecs,proto3" json:"auto_screen_carousel_secs,omitempty"`
-	CompassNorthTop    bool   `protobuf:"varint,4,opt,name=compass_north_top,json=compassNorthTop,proto3" json:"compass_north_top,omitempty"`
-	FlipScreen         bool   `protobuf:"varint,5,opt,name=flip_screen,json=flipScreen,proto3" json:"flip_screen,omitempty"`
+	ScreenOnSecs       uint32 `protobuf:"varint,1,opt,name=screen_on_secs,json=screenOnSecs,proto3" json:"screenOnSecs,omitempty"`
+	GpsFormat          uint32 `protobuf:"varint,2,opt,name=gps_format,json=gpsFormat,proto3" json:"gpsFormat,omitempty"`
+	AutoScreenCarouselSecs uint32 `protobuf:"varint,3,opt,name=auto_screen_carousel_secs,json=autoScreenCarouselSecs,proto3" json:"autoScreenCarouselSecs,omitempty"`
+	CompassNorthTop    bool   `protobuf:"varint,4,opt,name=compass_north_top,json=compassNorthTop,proto3" json:"compassNorthTop,omitempty"`
+	FlipScreen         bool   `protobuf:"varint,5,opt,name=flip_screen,json=flipScreen,proto3" json:"flipScreen,omitempty"`
 	Units              uint32 `protobuf:"varint,6,opt,name=units,proto3" json:"units,omitempty"`
 	Oled               uint32 `protobuf:"varint,7,opt,name=oled,proto3" json:"oled,omitempty"`
-	DisplayMode        uint32 `protobuf:"varint,8,opt,name=display_mode,json=displayMode,proto3" json:"display_mode,omitempty"`
-	HeadingBold        bool   `protobuf:"varint,9,opt,name=heading_bold,json=headingBold,proto3" json:"heading_bold,omitempty"`
-	WakeOnTapOrMotion  bool   `protobuf:"varint,10,opt,name=wake_on_tap_or_motion,json=wakeOnTapOrMotion,proto3" json:"wake_on_tap_or_motion,omitempty"`
-	CompassOrientation uint32 `protobuf:"varint,11,opt,name=compass_orientation,json=compassOrientation,proto3" json:"compass_orientation,omitempty"`
+	DisplayMode        uint32 `protobuf:"varint,8,opt,name=display_mode,json=displayMode,proto3" json:"displayMode,omitempty"`
+	HeadingBold        bool   `protobuf:"varint,9,opt,name=heading_bold,json=headingBold,proto3" json:"headingBold,omitempty"`
+	WakeOnTapOrMotion  bool   `protobuf:"varint,10,opt,name=wake_on_tap_or_motion,json=wakeOnTapOrMotion,proto3" json:"wakeOnTapOrMotion,omitempty"`
+	CompassOrientation uint32 `protobuf:"varint,11,opt,name=compass_orientation,json=compassOrientation,proto3" json:"compassOrientation,omitempty"`
 }
 
 func (c *Config_DisplayConfig) Reset() { *c = Config_DisplayConfig{} }
@@ -248,23 +248,23 @@ func (c *Config_DisplayConfig) ProtoMessage() {}
 
 // LoRaConfig contains LoRa radio settings.
 type Config_LoRaConfig struct {
-	UsePreset           bool                         `protobuf:"varint,1,opt,name=use_preset,json=usePreset,proto3" json:"use_preset,omitempty"`
-	ModemPreset         Config_LoRaConfig_ModemPreset `protobuf:"varint,2,opt,name=modem_preset,json=modemPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"modem_preset,omitempty"`
+	UsePreset           bool                         `protobuf:"varint,1,opt,name=use_preset,json=usePreset,proto3" json:"usePreset,omitempty"`
+	ModemPreset         Config_LoRaConfig_ModemPreset `protobuf:"varint,2,opt,name=modem_preset,json=modemPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"modemPreset,omitempty"`
 	Bandwidth           uint32                       `protobuf:"varint,3,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
-	SpreadFactor        uint32                       `protobuf:"varint,4,opt,name=spread_factor,json=spreadFactor,proto3" json:"spread_factor,omitempty"`
-	CodingRate          uint32                       `protobuf:"varint,5,opt,name=coding_rate,json=codingRate,proto3" json:"coding_rate,omitempty"`
-	FrequencyOffset     float32                      `protobuf:"fixed32,6,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequency_offset,omitempty"`
+	SpreadFactor        uint32                       `protobuf:"varint,4,opt,name=spread_factor,json=spreadFactor,proto3" json:"spreadFactor,omitempty"`
+	CodingRate          uint32                       `protobuf:"varint,5,opt,name=coding_rate,json=codingRate,proto3" json:"codingRate,omitempty"`
+	FrequencyOffset     float32                      `protobuf:"fixed32,6,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequencyOffset,omitempty"`
 	Region              Config_LoRaConfig_RegionCode `protobuf:"varint,7,opt,name=region,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"region,omitempty"`
-	HopLimit            uint32                       `protobuf:"varint,8,opt,name=hop_limit,json=hopLimit,proto3" json:"hop_limit,omitempty"`
-	TxEnabled           bool                         `protobuf:"varint,9,opt,name=tx_enabled,json=txEnabled,proto3" json:"tx_enabled,omitempty"`
-	TxPower             int32                        `protobuf:"varint,10,opt,name=tx_power,json=txPower,proto3" json:"tx_power,omitempty"`
-	ChannelNum          uint32                       `protobuf:"varint,11,opt,name=channel_num,json=channelNum,proto3" json:"channel_num,omitempty"`
-	OverrideDutyCycle   bool                         `protobuf:"varint,12,opt,name=override_duty_cycle,json=overrideDutyCycle,proto3" json:"override_duty_cycle,omitempty"`
-	Sx126xRxBoostedGain bool                         `protobuf:"varint,13,opt,name=sx126x_rx_boosted_gain,json=sx126xRxBoostedGain,proto3" json:"sx126x_rx_boosted_gain,omitempty"`
-	OverrideFrequency   float32                      `protobuf:"fixed32,14,opt,name=override_frequency,json=overrideFrequency,proto3" json:"override_frequency,omitempty"`
-	PaFanDisabled       bool                         `protobuf:"varint,15,opt,name=pa_fan_disabled,json=paFanDisabled,proto3" json:"pa_fan_disabled,omitempty"`
-	IgnoreIncoming      []uint32                     `protobuf:"varint,103,rep,packed,name=ignore_incoming,json=ignoreIncoming,proto3" json:"ignore_incoming,omitempty"`
-	IgnoreMqtt          bool                         `protobuf:"varint,104,opt,name=ignore_mqtt,json=ignoreMqtt,proto3" json:"ignore_mqtt,omitempty"`
+	HopLimit            uint32                       `protobuf:"varint,8,opt,name=hop_limit,json=hopLimit,proto3" json:"hopLimit,omitempty"`
+	TxEnabled           bool                         `protobuf:"varint,9,opt,name=tx_enabled,json=txEnabled,proto3" json:"txEnabled,omitempty"`
+	TxPower             int32                        `protobuf:"varint,10,opt,name=tx_power,json=txPower,proto3" json:"txPower,omitempty"`
+	ChannelNum          uint32                       `protobuf:"varint,11,opt,name=channel_num,json=channelNum,proto3" json:"channelNum,omitempty"`
+	OverrideDutyCycle   bool                         `protobuf:"varint,12,opt,name=override_duty_cycle,json=overrideDutyCycle,proto3" json:"overrideDutyCycle,omitempty"`
+	Sx126xRxBoostedGain bool                         `protobuf:"varint,13,opt,name=sx126x_rx_boosted_gain,json=sx126xRxBoostedGain,proto3" json:"sx126xRxBoostedGain,omitempty"`
+	OverrideFrequency   float32                      `protobuf:"fixed32,14,opt,name=override_frequency,json=overrideFrequency,proto3" json:"overrideFrequency,omitempty"`
+	PaFanDisabled       bool                         `protobuf:"varint,15,opt,name=pa_fan_disabled,json=paFanDisabled,proto3" json:"paFanDisabled,omitempty"`
+	IgnoreIncoming      []uint32                     `protobuf:"varint,103,rep,packed,name=ignore_incoming,json=ignoreIncoming,proto3" json:"ignoreIncoming,omitempty"`
+	IgnoreMqtt          bool                         `protobuf:"varint,104,opt,name=ignore_mqtt,json=ignoreMqtt,proto3" json:"ignoreMqtt,omitempty"`
 }
 
 func (c *Config_LoRaConfig) Reset() { *c = Config_LoRaConfig{} }
@@ -274,7 +274,7 @@ func (c *Config_LoRaConfig) ProtoMessage() {}
 type Config_BluetoothConfig struct {
 	Enabled     bool                               `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	Mode        Config_BluetoothConfig_PairingMode `protobuf:"varint,2,opt,name=mode,proto3,enum=meshtastic.Config_BluetoothConfig_PairingMode" json:"mode,omitempty"`
-	FixedPin    uint32                             `protobuf:"varint,3,opt,name=fixed_pin,json=fixedPin,proto3" json:"fixed_pin,omitempty"`
+	FixedPin    uint32                             `protobuf:"varint,3,opt,name=fixed_pin,json=fixedPin,proto3" json:"fixedPin,omitempty"`
 }
 
 func (c *Config_BluetoothConfig) Reset() { *c = Config_BluetoothConfig{} }
@@ -282,13 +282,13 @@ func (c *Config_BluetoothConfig) ProtoMessage() {}
 
 // SecurityConfig contains security settings.
 type Config_SecurityConfig struct {
-	PublicKey                []byte `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	PrivateKey               []byte `protobuf:"bytes,2,opt,name=private_key,json=privateKey,proto3" json:"private_key,omitempty"`
-	AdminKey                 []byte `protobuf:"bytes,3,opt,name=admin_key,json=adminKey,proto3" json:"admin_key,omitempty"`
-	IsManaged                bool   `protobuf:"varint,4,opt,name=is_managed,json=isManaged,proto3" json:"is_managed,omitempty"`
-	SerialEnabled            bool   `protobuf:"varint,5,opt,name=serial_enabled,json=serialEnabled,proto3" json:"serial_enabled,omitempty"`
-	DebugLogApiEnabled       bool   `protobuf:"varint,6,opt,name=debug_log_api_enabled,json=debugLogApiEnabled,proto3" json:"debug_log_api_enabled,omitempty"`
-	AdminChannelEnabled      bool   `protobuf:"varint,8,opt,name=admin_channel_enabled,json=adminChannelEnabled,proto3" json:"admin_channel_enabled,omitempty"`
+	PublicKey                []byte `protobuf:"bytes,1,opt,name=public_key,json=publicKey,proto3" json:"publicKey,omitempty"`
+	PrivateKey               []byte `protobuf:"bytes,2,opt,name=private_key,json=privateKey,proto3" json:"privateKey,omitempty"`
+	AdminKey                 []byte `protobuf:"bytes,3,opt,name=admin_key,json=adminKey,proto3" json:"adminKey,omitempty"`
+	IsManaged                bool   `protobuf:"varint,4,opt,name=is_managed,json=isManaged,proto3" json:"isManaged,omitempty"`
+	SerialEnabled            bool   `protobuf:"varint,5,opt,name=serial_enabled,json=serialEnabled,proto3" json:"serialEnabled,omitempty"`
+	DebugLogApiEnabled       bool   `protobuf:"varint,6,opt,name=debug_log_api_enabled,json=debugLogApiEnabled,proto3" json:"debugLogApiEnabled,omitempty"`
+	AdminChannelEnabled      bool   `protobuf:"varint,8,opt,name=admin_channel_enabled,json=adminChannelEnabled,proto3" json:"adminChannelEnabled,omitempty"`
 }
 
 func (c *Config_SecurityConfig) Reset() { *c = Config_SecurityConfig{} }

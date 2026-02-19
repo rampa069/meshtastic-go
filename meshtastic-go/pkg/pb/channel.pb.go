@@ -27,13 +27,13 @@ func (x Channel_Role) String() string {
 
 // ChannelSettings contains channel configuration.
 type ChannelSettings struct {
-	ChannelNum      uint32          `protobuf:"varint,1,opt,name=channel_num,json=channelNum,proto3" json:"channel_num,omitempty"`
+	ChannelNum      uint32          `protobuf:"varint,1,opt,name=channel_num,json=channelNum,proto3" json:"channelNum,omitempty"`
 	Psk             []byte          `protobuf:"bytes,2,opt,name=psk,proto3" json:"psk,omitempty"`
 	Name            string          `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Id              uint32          `protobuf:"fixed32,4,opt,name=id,proto3" json:"id,omitempty"`
-	UplinkEnabled   bool            `protobuf:"varint,5,opt,name=uplink_enabled,json=uplinkEnabled,proto3" json:"uplink_enabled,omitempty"`
-	DownlinkEnabled bool            `protobuf:"varint,6,opt,name=downlink_enabled,json=downlinkEnabled,proto3" json:"downlink_enabled,omitempty"`
-	ModuleSettings  *ModuleSettings `protobuf:"bytes,7,opt,name=module_settings,json=moduleSettings,proto3" json:"module_settings,omitempty"`
+	UplinkEnabled   bool            `protobuf:"varint,5,opt,name=uplink_enabled,json=uplinkEnabled,proto3" json:"uplinkEnabled,omitempty"`
+	DownlinkEnabled bool            `protobuf:"varint,6,opt,name=downlink_enabled,json=downlinkEnabled,proto3" json:"downlinkEnabled,omitempty"`
+	ModuleSettings  *ModuleSettings `protobuf:"bytes,7,opt,name=module_settings,json=moduleSettings,proto3" json:"moduleSettings,omitempty"`
 }
 
 func (c *ChannelSettings) Reset() { *c = ChannelSettings{} }
@@ -41,8 +41,8 @@ func (c *ChannelSettings) ProtoMessage() {}
 
 // ModuleSettings contains per-channel module settings.
 type ModuleSettings struct {
-	PositionPrecision uint32 `protobuf:"varint,1,opt,name=position_precision,json=positionPrecision,proto3" json:"position_precision,omitempty"`
-	IsClientMuted     bool   `protobuf:"varint,2,opt,name=is_client_muted,json=isClientMuted,proto3" json:"is_client_muted,omitempty"`
+	PositionPrecision uint32 `protobuf:"varint,1,opt,name=position_precision,json=positionPrecision,proto3" json:"positionPrecision,omitempty"`
+	IsClientMuted     bool   `protobuf:"varint,2,opt,name=is_client_muted,json=isClientMuted,proto3" json:"isClientMuted,omitempty"`
 }
 
 func (m *ModuleSettings) Reset() { *m = ModuleSettings{} }
@@ -61,7 +61,7 @@ func (c *Channel) ProtoMessage() {}
 // ChannelSet is a compact representation of multiple channels.
 type ChannelSet struct {
 	Settings   []*ChannelSettings    `protobuf:"bytes,1,rep,name=settings,proto3" json:"settings,omitempty"`
-	LoraConfig *Config_LoRaConfig    `protobuf:"bytes,2,opt,name=lora_config,json=loraConfig,proto3" json:"lora_config,omitempty"`
+	LoraConfig *Config_LoRaConfig    `protobuf:"bytes,2,opt,name=lora_config,json=loraConfig,proto3" json:"loraConfig,omitempty"`
 }
 
 func (c *ChannelSet) Reset() { *c = ChannelSet{} }

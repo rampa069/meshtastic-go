@@ -288,29 +288,29 @@ const (
 
 // Position represents GPS location data.
 type Position struct {
-	LatitudeI         int32  `protobuf:"sfixed32,1,opt,name=latitude_i,json=latitudeI,proto3" json:"latitude_i,omitempty"`
-	LongitudeI        int32  `protobuf:"sfixed32,2,opt,name=longitude_i,json=longitudeI,proto3" json:"longitude_i,omitempty"`
+	LatitudeI         int32  `protobuf:"sfixed32,1,opt,name=latitude_i,json=latitudeI,proto3" json:"latitudeI,omitempty"`
+	LongitudeI        int32  `protobuf:"sfixed32,2,opt,name=longitude_i,json=longitudeI,proto3" json:"longitudeI,omitempty"`
 	Altitude          int32  `protobuf:"varint,3,opt,name=altitude,proto3" json:"altitude,omitempty"`
 	Time              uint32 `protobuf:"fixed32,4,opt,name=time,proto3" json:"time,omitempty"`
-	LocationSource    uint32 `protobuf:"varint,5,opt,name=location_source,json=locationSource,proto3" json:"location_source,omitempty"`
-	AltitudeSource    uint32 `protobuf:"varint,6,opt,name=altitude_source,json=altitudeSource,proto3" json:"altitude_source,omitempty"`
+	LocationSource    uint32 `protobuf:"varint,5,opt,name=location_source,json=locationSource,proto3" json:"locationSource,omitempty"`
+	AltitudeSource    uint32 `protobuf:"varint,6,opt,name=altitude_source,json=altitudeSource,proto3" json:"altitudeSource,omitempty"`
 	Timestamp         uint32 `protobuf:"fixed32,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	TimestampMillisAdjust int32 `protobuf:"varint,8,opt,name=timestamp_millis_adjust,json=timestampMillisAdjust,proto3" json:"timestamp_millis_adjust,omitempty"`
-	AltitudeHae       int32  `protobuf:"sint32,9,opt,name=altitude_hae,json=altitudeHae,proto3" json:"altitude_hae,omitempty"`
-	AltitudeGeoidalSeparation int32 `protobuf:"sint32,10,opt,name=altitude_geoidal_separation,json=altitudeGeoidalSeparation,proto3" json:"altitude_geoidal_separation,omitempty"`
+	TimestampMillisAdjust int32 `protobuf:"varint,8,opt,name=timestamp_millis_adjust,json=timestampMillisAdjust,proto3" json:"timestampMillisAdjust,omitempty"`
+	AltitudeHae       int32  `protobuf:"sint32,9,opt,name=altitude_hae,json=altitudeHae,proto3" json:"altitudeHae,omitempty"`
+	AltitudeGeoidalSeparation int32 `protobuf:"sint32,10,opt,name=altitude_geoidal_separation,json=altitudeGeoidalSeparation,proto3" json:"altitudeGeoidalSeparation,omitempty"`
 	PDOP              uint32 `protobuf:"varint,11,opt,name=PDOP,proto3" json:"PDOP,omitempty"`
 	HDOP              uint32 `protobuf:"varint,12,opt,name=HDOP,proto3" json:"HDOP,omitempty"`
 	VDOP              uint32 `protobuf:"varint,13,opt,name=VDOP,proto3" json:"VDOP,omitempty"`
-	GpsAccuracy       uint32 `protobuf:"varint,14,opt,name=gps_accuracy,json=gpsAccuracy,proto3" json:"gps_accuracy,omitempty"`
-	GroundSpeed       uint32 `protobuf:"varint,15,opt,name=ground_speed,json=groundSpeed,proto3" json:"ground_speed,omitempty"`
-	GroundTrack       uint32 `protobuf:"varint,16,opt,name=ground_track,json=groundTrack,proto3" json:"ground_track,omitempty"`
-	FixQuality        uint32 `protobuf:"varint,17,opt,name=fix_quality,json=fixQuality,proto3" json:"fix_quality,omitempty"`
-	FixType           uint32 `protobuf:"varint,18,opt,name=fix_type,json=fixType,proto3" json:"fix_type,omitempty"`
-	SatsInView        uint32 `protobuf:"varint,19,opt,name=sats_in_view,json=satsInView,proto3" json:"sats_in_view,omitempty"`
-	SensorId          uint32 `protobuf:"varint,20,opt,name=sensor_id,json=sensorId,proto3" json:"sensor_id,omitempty"`
-	NextUpdate        uint32 `protobuf:"varint,21,opt,name=next_update,json=nextUpdate,proto3" json:"next_update,omitempty"`
-	SeqNumber         uint32 `protobuf:"varint,22,opt,name=seq_number,json=seqNumber,proto3" json:"seq_number,omitempty"`
-	PrecisionBits     uint32 `protobuf:"varint,23,opt,name=precision_bits,json=precisionBits,proto3" json:"precision_bits,omitempty"`
+	GpsAccuracy       uint32 `protobuf:"varint,14,opt,name=gps_accuracy,json=gpsAccuracy,proto3" json:"gpsAccuracy,omitempty"`
+	GroundSpeed       uint32 `protobuf:"varint,15,opt,name=ground_speed,json=groundSpeed,proto3" json:"groundSpeed,omitempty"`
+	GroundTrack       uint32 `protobuf:"varint,16,opt,name=ground_track,json=groundTrack,proto3" json:"groundTrack,omitempty"`
+	FixQuality        uint32 `protobuf:"varint,17,opt,name=fix_quality,json=fixQuality,proto3" json:"fixQuality,omitempty"`
+	FixType           uint32 `protobuf:"varint,18,opt,name=fix_type,json=fixType,proto3" json:"fixType,omitempty"`
+	SatsInView        uint32 `protobuf:"varint,19,opt,name=sats_in_view,json=satsInView,proto3" json:"satsInView,omitempty"`
+	SensorId          uint32 `protobuf:"varint,20,opt,name=sensor_id,json=sensorId,proto3" json:"sensorId,omitempty"`
+	NextUpdate        uint32 `protobuf:"varint,21,opt,name=next_update,json=nextUpdate,proto3" json:"nextUpdate,omitempty"`
+	SeqNumber         uint32 `protobuf:"varint,22,opt,name=seq_number,json=seqNumber,proto3" json:"seqNumber,omitempty"`
+	PrecisionBits     uint32 `protobuf:"varint,23,opt,name=precision_bits,json=precisionBits,proto3" json:"precisionBits,omitempty"`
 }
 
 func (p *Position) Reset() { *p = Position{} }
@@ -339,13 +339,13 @@ func (p *Position) SetLongitude(lon float64) {
 // User represents a user identity in the mesh.
 type User struct {
 	Id            string        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	LongName      string        `protobuf:"bytes,2,opt,name=long_name,json=longName,proto3" json:"long_name,omitempty"`
-	ShortName     string        `protobuf:"bytes,3,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
+	LongName      string        `protobuf:"bytes,2,opt,name=long_name,json=longName,proto3" json:"longName,omitempty"`
+	ShortName     string        `protobuf:"bytes,3,opt,name=short_name,json=shortName,proto3" json:"shortName,omitempty"`
 	Macaddr       []byte        `protobuf:"bytes,4,opt,name=macaddr,proto3" json:"macaddr,omitempty"`
-	HwModel       HardwareModel `protobuf:"varint,5,opt,name=hw_model,json=hwModel,proto3,enum=meshtastic.HardwareModel" json:"hw_model,omitempty"`
-	IsLicensed    bool          `protobuf:"varint,6,opt,name=is_licensed,json=isLicensed,proto3" json:"is_licensed,omitempty"`
+	HwModel       HardwareModel `protobuf:"varint,5,opt,name=hw_model,json=hwModel,proto3,enum=meshtastic.HardwareModel" json:"hwModel,omitempty"`
+	IsLicensed    bool          `protobuf:"varint,6,opt,name=is_licensed,json=isLicensed,proto3" json:"isLicensed,omitempty"`
 	Role          uint32        `protobuf:"varint,7,opt,name=role,proto3" json:"role,omitempty"`
-	PublicKey     []byte        `protobuf:"bytes,8,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	PublicKey     []byte        `protobuf:"bytes,8,opt,name=public_key,json=publicKey,proto3" json:"publicKey,omitempty"`
 }
 
 func (u *User) Reset() { *u = User{} }
@@ -354,9 +354,9 @@ func (u *User) ProtoMessage() {}
 // RouteDiscovery contains route tracing information.
 type RouteDiscovery struct {
 	Route     []uint32 `protobuf:"fixed32,1,rep,packed,name=route,proto3" json:"route,omitempty"`
-	SnrTowards []int32 `protobuf:"zigzag32,2,rep,packed,name=snr_towards,json=snrTowards,proto3" json:"snr_towards,omitempty"`
-	RouteBack []uint32 `protobuf:"fixed32,3,rep,packed,name=route_back,json=routeBack,proto3" json:"route_back,omitempty"`
-	SnrBack   []int32  `protobuf:"zigzag32,4,rep,packed,name=snr_back,json=snrBack,proto3" json:"snr_back,omitempty"`
+	SnrTowards []int32 `protobuf:"zigzag32,2,rep,packed,name=snr_towards,json=snrTowards,proto3" json:"snrTowards,omitempty"`
+	RouteBack []uint32 `protobuf:"fixed32,3,rep,packed,name=route_back,json=routeBack,proto3" json:"routeBack,omitempty"`
+	SnrBack   []int32  `protobuf:"zigzag32,4,rep,packed,name=snr_back,json=snrBack,proto3" json:"snrBack,omitempty"`
 }
 
 func (r *RouteDiscovery) Reset() { *r = RouteDiscovery{} }
@@ -463,11 +463,11 @@ func (r *Routing) ProtoMessage() {}
 type Data struct {
 	Portnum          PortNum `protobuf:"varint,1,opt,name=portnum,proto3,enum=meshtastic.PortNum" json:"portnum,omitempty"`
 	Payload          []byte  `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
-	WantResponse     bool    `protobuf:"varint,3,opt,name=want_response,json=wantResponse,proto3" json:"want_response,omitempty"`
+	WantResponse     bool    `protobuf:"varint,3,opt,name=want_response,json=wantResponse,proto3" json:"wantResponse,omitempty"`
 	Dest             uint32  `protobuf:"fixed32,4,opt,name=dest,proto3" json:"dest,omitempty"`
 	Source           uint32  `protobuf:"fixed32,5,opt,name=source,proto3" json:"source,omitempty"`
-	RequestId        uint32  `protobuf:"fixed32,6,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	ReplyId          uint32  `protobuf:"fixed32,7,opt,name=reply_id,json=replyId,proto3" json:"reply_id,omitempty"`
+	RequestId        uint32  `protobuf:"fixed32,6,opt,name=request_id,json=requestId,proto3" json:"requestId,omitempty"`
+	ReplyId          uint32  `protobuf:"fixed32,7,opt,name=reply_id,json=replyId,proto3" json:"replyId,omitempty"`
 	Emoji            uint32  `protobuf:"fixed32,8,opt,name=emoji,proto3" json:"emoji,omitempty"`
 }
 
@@ -477,10 +477,10 @@ func (d *Data) ProtoMessage() {}
 // Waypoint represents a shareable location marker.
 type Waypoint struct {
 	Id          uint32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	LatitudeI   int32  `protobuf:"sfixed32,2,opt,name=latitude_i,json=latitudeI,proto3" json:"latitude_i,omitempty"`
-	LongitudeI  int32  `protobuf:"sfixed32,3,opt,name=longitude_i,json=longitudeI,proto3" json:"longitude_i,omitempty"`
+	LatitudeI   int32  `protobuf:"sfixed32,2,opt,name=latitude_i,json=latitudeI,proto3" json:"latitudeI,omitempty"`
+	LongitudeI  int32  `protobuf:"sfixed32,3,opt,name=longitude_i,json=longitudeI,proto3" json:"longitudeI,omitempty"`
 	Expire      uint32 `protobuf:"varint,4,opt,name=expire,proto3" json:"expire,omitempty"`
-	LockedTo    uint32 `protobuf:"varint,5,opt,name=locked_to,json=lockedTo,proto3" json:"locked_to,omitempty"`
+	LockedTo    uint32 `protobuf:"varint,5,opt,name=locked_to,json=lockedTo,proto3" json:"lockedTo,omitempty"`
 	Name        string `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,7,opt,name=description,proto3" json:"description,omitempty"`
 	Icon        uint32 `protobuf:"fixed32,8,opt,name=icon,proto3" json:"icon,omitempty"`
@@ -499,17 +499,17 @@ type MeshPacket struct {
 	//	*MeshPacket_Encrypted
 	PayloadVariant isMeshPacket_PayloadVariant
 	Id             uint32              `protobuf:"fixed32,6,opt,name=id,proto3" json:"id,omitempty"`
-	RxTime         uint32              `protobuf:"fixed32,7,opt,name=rx_time,json=rxTime,proto3" json:"rx_time,omitempty"`
-	RxSnr          float32             `protobuf:"fixed32,8,opt,name=rx_snr,json=rxSnr,proto3" json:"rx_snr,omitempty"`
-	HopLimit       uint32              `protobuf:"varint,9,opt,name=hop_limit,json=hopLimit,proto3" json:"hop_limit,omitempty"`
-	WantAck        bool                `protobuf:"varint,10,opt,name=want_ack,json=wantAck,proto3" json:"want_ack,omitempty"`
+	RxTime         uint32              `protobuf:"fixed32,7,opt,name=rx_time,json=rxTime,proto3" json:"rxTime,omitempty"`
+	RxSnr          float32             `protobuf:"fixed32,8,opt,name=rx_snr,json=rxSnr,proto3" json:"rxSnr,omitempty"`
+	HopLimit       uint32              `protobuf:"varint,9,opt,name=hop_limit,json=hopLimit,proto3" json:"hopLimit,omitempty"`
+	WantAck        bool                `protobuf:"varint,10,opt,name=want_ack,json=wantAck,proto3" json:"wantAck,omitempty"`
 	Priority       MeshPacket_Priority `protobuf:"varint,11,opt,name=priority,proto3,enum=meshtastic.MeshPacket_Priority" json:"priority,omitempty"`
-	RxRssi         int32               `protobuf:"varint,12,opt,name=rx_rssi,json=rxRssi,proto3" json:"rx_rssi,omitempty"`
+	RxRssi         int32               `protobuf:"varint,12,opt,name=rx_rssi,json=rxRssi,proto3" json:"rxRssi,omitempty"`
 	Delayed        uint32              `protobuf:"varint,13,opt,name=delayed,proto3" json:"delayed,omitempty"`
-	ViaMqtt        bool                `protobuf:"varint,14,opt,name=via_mqtt,json=viaMqtt,proto3" json:"via_mqtt,omitempty"`
-	HopStart       uint32              `protobuf:"varint,15,opt,name=hop_start,json=hopStart,proto3" json:"hop_start,omitempty"`
-	PublicKey      []byte              `protobuf:"bytes,16,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	PkiEncrypted   bool                `protobuf:"varint,17,opt,name=pki_encrypted,json=pkiEncrypted,proto3" json:"pki_encrypted,omitempty"`
+	ViaMqtt        bool                `protobuf:"varint,14,opt,name=via_mqtt,json=viaMqtt,proto3" json:"viaMqtt,omitempty"`
+	HopStart       uint32              `protobuf:"varint,15,opt,name=hop_start,json=hopStart,proto3" json:"hopStart,omitempty"`
+	PublicKey      []byte              `protobuf:"bytes,16,opt,name=public_key,json=publicKey,proto3" json:"publicKey,omitempty"`
+	PkiEncrypted   bool                `protobuf:"varint,17,opt,name=pki_encrypted,json=pkiEncrypted,proto3" json:"pkiEncrypted,omitempty"`
 }
 
 type isMeshPacket_PayloadVariant interface {
@@ -550,12 +550,12 @@ type NodeInfo struct {
 	User          *User     `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Position      *Position `protobuf:"bytes,3,opt,name=position,proto3" json:"position,omitempty"`
 	Snr           float32   `protobuf:"fixed32,4,opt,name=snr,proto3" json:"snr,omitempty"`
-	LastHeard     uint32    `protobuf:"fixed32,5,opt,name=last_heard,json=lastHeard,proto3" json:"last_heard,omitempty"`
-	DeviceMetrics *DeviceMetrics `protobuf:"bytes,6,opt,name=device_metrics,json=deviceMetrics,proto3" json:"device_metrics,omitempty"`
+	LastHeard     uint32    `protobuf:"fixed32,5,opt,name=last_heard,json=lastHeard,proto3" json:"lastHeard,omitempty"`
+	DeviceMetrics *DeviceMetrics `protobuf:"bytes,6,opt,name=device_metrics,json=deviceMetrics,proto3" json:"deviceMetrics,omitempty"`
 	Channel       uint32    `protobuf:"varint,7,opt,name=channel,proto3" json:"channel,omitempty"`
-	ViaMqtt       bool      `protobuf:"varint,8,opt,name=via_mqtt,json=viaMqtt,proto3" json:"via_mqtt,omitempty"`
+	ViaMqtt       bool      `protobuf:"varint,8,opt,name=via_mqtt,json=viaMqtt,proto3" json:"viaMqtt,omitempty"`
 	Hops          uint32    `protobuf:"varint,9,opt,name=hops,proto3" json:"hops,omitempty"`
-	IsFavorite    bool      `protobuf:"varint,10,opt,name=is_favorite,json=isFavorite,proto3" json:"is_favorite,omitempty"`
+	IsFavorite    bool      `protobuf:"varint,10,opt,name=is_favorite,json=isFavorite,proto3" json:"isFavorite,omitempty"`
 }
 
 func (n *NodeInfo) Reset() { *n = NodeInfo{} }
@@ -563,9 +563,9 @@ func (n *NodeInfo) ProtoMessage() {}
 
 // MyNodeInfo contains local debugging information.
 type MyNodeInfo struct {
-	MyNodeNum            uint32 `protobuf:"varint,1,opt,name=my_node_num,json=myNodeNum,proto3" json:"my_node_num,omitempty"`
-	RebootCount          uint32 `protobuf:"varint,8,opt,name=reboot_count,json=rebootCount,proto3" json:"reboot_count,omitempty"`
-	MinAppVersion        uint32 `protobuf:"varint,11,opt,name=min_app_version,json=minAppVersion,proto3" json:"min_app_version,omitempty"`
+	MyNodeNum            uint32 `protobuf:"varint,1,opt,name=my_node_num,json=myNodeNum,proto3" json:"myNodeNum,omitempty"`
+	RebootCount          uint32 `protobuf:"varint,8,opt,name=reboot_count,json=rebootCount,proto3" json:"rebootCount,omitempty"`
+	MinAppVersion        uint32 `protobuf:"varint,11,opt,name=min_app_version,json=minAppVersion,proto3" json:"minAppVersion,omitempty"`
 }
 
 func (m *MyNodeInfo) Reset() { *m = MyNodeInfo{} }
@@ -587,7 +587,7 @@ type QueueStatus struct {
 	Res       int32  `protobuf:"varint,1,opt,name=res,proto3" json:"res,omitempty"`
 	Free      uint32 `protobuf:"varint,2,opt,name=free,proto3" json:"free,omitempty"`
 	Maxlen    uint32 `protobuf:"varint,3,opt,name=maxlen,proto3" json:"maxlen,omitempty"`
-	MeshPacketId uint32 `protobuf:"fixed32,4,opt,name=mesh_packet_id,json=meshPacketId,proto3" json:"mesh_packet_id,omitempty"`
+	MeshPacketId uint32 `protobuf:"fixed32,4,opt,name=mesh_packet_id,json=meshPacketId,proto3" json:"meshPacketId,omitempty"`
 }
 
 func (q *QueueStatus) Reset() { *q = QueueStatus{} }
@@ -865,8 +865,8 @@ func (m *MqttClientProxyMessage) ProtoMessage() {}
 
 // FileInfo contains file metadata.
 type FileInfo struct {
-	FileName  string `protobuf:"bytes,1,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	SizeBytes uint32 `protobuf:"varint,2,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`
+	FileName  string `protobuf:"bytes,1,opt,name=file_name,json=fileName,proto3" json:"fileName,omitempty"`
+	SizeBytes uint32 `protobuf:"varint,2,opt,name=size_bytes,json=sizeBytes,proto3" json:"sizeBytes,omitempty"`
 }
 
 func (f *FileInfo) Reset() { *f = FileInfo{} }
@@ -874,7 +874,7 @@ func (f *FileInfo) ProtoMessage() {}
 
 // ClientNotification is sent from the device to notify the client.
 type ClientNotification struct {
-	ReplyId       uint32 `protobuf:"varint,1,opt,name=reply_id,json=replyId,proto3" json:"reply_id,omitempty"`
+	ReplyId       uint32 `protobuf:"varint,1,opt,name=reply_id,json=replyId,proto3" json:"replyId,omitempty"`
 	Time          uint32 `protobuf:"fixed32,2,opt,name=time,proto3" json:"time,omitempty"`
 	Level         uint32 `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
 	Message       string `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
@@ -885,17 +885,17 @@ func (c *ClientNotification) ProtoMessage() {}
 
 // DeviceMetadata contains device information.
 type DeviceMetadata struct {
-	FirmwareVersion    string        `protobuf:"bytes,1,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
-	DeviceStateVersion uint32        `protobuf:"varint,2,opt,name=device_state_version,json=deviceStateVersion,proto3" json:"device_state_version,omitempty"`
-	CanShutdown        bool          `protobuf:"varint,3,opt,name=can_shutdown,json=canShutdown,proto3" json:"can_shutdown,omitempty"`
-	HasWifi            bool          `protobuf:"varint,4,opt,name=has_wifi,json=hasWifi,proto3" json:"has_wifi,omitempty"`
-	HasBluetooth       bool          `protobuf:"varint,5,opt,name=has_bluetooth,json=hasBluetooth,proto3" json:"has_bluetooth,omitempty"`
-	HasEthernet        bool          `protobuf:"varint,6,opt,name=has_ethernet,json=hasEthernet,proto3" json:"has_ethernet,omitempty"`
+	FirmwareVersion    string        `protobuf:"bytes,1,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmwareVersion,omitempty"`
+	DeviceStateVersion uint32        `protobuf:"varint,2,opt,name=device_state_version,json=deviceStateVersion,proto3" json:"deviceStateVersion,omitempty"`
+	CanShutdown        bool          `protobuf:"varint,3,opt,name=can_shutdown,json=canShutdown,proto3" json:"canShutdown,omitempty"`
+	HasWifi            bool          `protobuf:"varint,4,opt,name=has_wifi,json=hasWifi,proto3" json:"hasWifi,omitempty"`
+	HasBluetooth       bool          `protobuf:"varint,5,opt,name=has_bluetooth,json=hasBluetooth,proto3" json:"hasBluetooth,omitempty"`
+	HasEthernet        bool          `protobuf:"varint,6,opt,name=has_ethernet,json=hasEthernet,proto3" json:"hasEthernet,omitempty"`
 	Role               uint32        `protobuf:"varint,7,opt,name=role,proto3" json:"role,omitempty"`
-	PositionFlags      uint32        `protobuf:"varint,8,opt,name=position_flags,json=positionFlags,proto3" json:"position_flags,omitempty"`
-	HwModel            HardwareModel `protobuf:"varint,9,opt,name=hw_model,json=hwModel,proto3,enum=meshtastic.HardwareModel" json:"hw_model,omitempty"`
-	HasRemoteHardware  bool          `protobuf:"varint,10,opt,name=has_remote_hardware,json=hasRemoteHardware,proto3" json:"has_remote_hardware,omitempty"`
-	HasPKC             bool          `protobuf:"varint,11,opt,name=has_pkc,json=hasPkc,proto3" json:"has_pkc,omitempty"`
+	PositionFlags      uint32        `protobuf:"varint,8,opt,name=position_flags,json=positionFlags,proto3" json:"positionFlags,omitempty"`
+	HwModel            HardwareModel `protobuf:"varint,9,opt,name=hw_model,json=hwModel,proto3,enum=meshtastic.HardwareModel" json:"hwModel,omitempty"`
+	HasRemoteHardware  bool          `protobuf:"varint,10,opt,name=has_remote_hardware,json=hasRemoteHardware,proto3" json:"hasRemoteHardware,omitempty"`
+	HasPKC             bool          `protobuf:"varint,11,opt,name=has_pkc,json=hasPkc,proto3" json:"hasPkc,omitempty"`
 }
 
 func (d *DeviceMetadata) Reset() { *d = DeviceMetadata{} }
@@ -912,9 +912,9 @@ func (c *Compressed) ProtoMessage() {}
 
 // NeighborInfo contains information about mesh neighbors.
 type NeighborInfo struct {
-	NodeId               uint32      `protobuf:"varint,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	LastSentById         uint32      `protobuf:"varint,2,opt,name=last_sent_by_id,json=lastSentById,proto3" json:"last_sent_by_id,omitempty"`
-	NodeBroadcastIntervalSecs uint32 `protobuf:"varint,3,opt,name=node_broadcast_interval_secs,json=nodeBroadcastIntervalSecs,proto3" json:"node_broadcast_interval_secs,omitempty"`
+	NodeId               uint32      `protobuf:"varint,1,opt,name=node_id,json=nodeId,proto3" json:"nodeId,omitempty"`
+	LastSentById         uint32      `protobuf:"varint,2,opt,name=last_sent_by_id,json=lastSentById,proto3" json:"lastSentById,omitempty"`
+	NodeBroadcastIntervalSecs uint32 `protobuf:"varint,3,opt,name=node_broadcast_interval_secs,json=nodeBroadcastIntervalSecs,proto3" json:"nodeBroadcastIntervalSecs,omitempty"`
 	Neighbors            []*Neighbor `protobuf:"bytes,4,rep,name=neighbors,proto3" json:"neighbors,omitempty"`
 }
 
@@ -923,10 +923,10 @@ func (n *NeighborInfo) ProtoMessage() {}
 
 // Neighbor represents a single mesh neighbor.
 type Neighbor struct {
-	NodeId   uint32  `protobuf:"varint,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	NodeId   uint32  `protobuf:"varint,1,opt,name=node_id,json=nodeId,proto3" json:"nodeId,omitempty"`
 	Snr      float32 `protobuf:"fixed32,2,opt,name=snr,proto3" json:"snr,omitempty"`
-	LastRxTime uint32 `protobuf:"fixed32,3,opt,name=last_rx_time,json=lastRxTime,proto3" json:"last_rx_time,omitempty"`
-	NodeBroadcastIntervalSecs uint32 `protobuf:"varint,4,opt,name=node_broadcast_interval_secs,json=nodeBroadcastIntervalSecs,proto3" json:"node_broadcast_interval_secs,omitempty"`
+	LastRxTime uint32 `protobuf:"fixed32,3,opt,name=last_rx_time,json=lastRxTime,proto3" json:"lastRxTime,omitempty"`
+	NodeBroadcastIntervalSecs uint32 `protobuf:"varint,4,opt,name=node_broadcast_interval_secs,json=nodeBroadcastIntervalSecs,proto3" json:"nodeBroadcastIntervalSecs,omitempty"`
 }
 
 func (n *Neighbor) Reset() { *n = Neighbor{} }
@@ -1048,8 +1048,8 @@ func marshalNodeInfo(n *NodeInfo) ([]byte, error) {
 // This allows MQTT gateways to pass along packets from the mesh.
 type ServiceEnvelope struct {
 	Packet    *MeshPacket `protobuf:"bytes,1,opt,name=packet,proto3" json:"packet,omitempty"`
-	ChannelId string      `protobuf:"bytes,2,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
-	GatewayId string      `protobuf:"bytes,3,opt,name=gateway_id,json=gatewayId,proto3" json:"gateway_id,omitempty"`
+	ChannelId string      `protobuf:"bytes,2,opt,name=channel_id,json=channelId,proto3" json:"channelId,omitempty"`
+	GatewayId string      `protobuf:"bytes,3,opt,name=gateway_id,json=gatewayId,proto3" json:"gatewayId,omitempty"`
 }
 
 func (s *ServiceEnvelope) Reset() { *s = ServiceEnvelope{} }
