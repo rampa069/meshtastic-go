@@ -748,6 +748,11 @@ function removeNode(num) {
 
 function renderNodeList() {
     let nodeArray = Object.values(nodes);
+
+    // Hide nodes not heard in over 1 week (always keep local node)
+    const oneWeekAgo = Date.now() / 1000 - 7 * 86400;
+    nodeArray = nodeArray.filter(n => (myNode && n.num === myNode.num) || (n.lastHeard && n.lastHeard > oneWeekAgo));
+
     const totalCount = nodeArray.length;
 
     if (totalCount === 0) {
