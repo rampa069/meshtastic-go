@@ -442,8 +442,8 @@ func (s *Server) handleExportChannelURL(c *gin.Context) {
 		Settings: make([]*pb.ChannelSettings, 0, len(rawChannels)),
 		LoraConfig: &pb.Config_LoRaConfig{
 			UsePreset:   true,
-			ModemPreset: modemPresetFromString(config.ModemPreset),
-			Region:      regionFromString(config.Region),
+			ModemPreset: uint32(modemPresetFromString(config.ModemPreset)),
+			Region:      uint32(regionFromString(config.Region)),
 			HopLimit:    uint32(config.HopLimit),
 			TxEnabled:   config.TxEnabled,
 			TxPower:     config.TxPower,
@@ -1628,7 +1628,7 @@ func (s *Server) Shutdown(ctx context.Context) error {
 func (s *Server) buildChannel(index uint32, name string, role int32, psk []byte) *pb.Channel {
 	channel := &pb.Channel{
 		Index: index,
-		Role:  pb.Channel_Role(role),
+		Role:  uint32(role),
 		Settings: &pb.ChannelSettings{
 			Name: name,
 		},

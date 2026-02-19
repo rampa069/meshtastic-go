@@ -58,7 +58,7 @@ type ModuleConfig_SerialConfig struct {
 	Echo                      bool                                  `protobuf:"varint,2,opt,name=echo,proto3" json:"echo,omitempty"`
 	RxD                       uint32                                `protobuf:"varint,3,opt,name=rxd,proto3" json:"rxd,omitempty"`
 	TxD                       uint32                                `protobuf:"varint,4,opt,name=txd,proto3" json:"txd,omitempty"`
-	Baud                      ModuleConfig_SerialConfig_Serial_Baud `protobuf:"varint,5,opt,name=baud,proto3,enum=meshtastic.ModuleConfig_SerialConfig_Serial_Baud" json:"baud,omitempty"`
+	Baud                      uint32 `protobuf:"varint,5,opt,name=baud,proto3,enum=meshtastic.ModuleConfig_SerialConfig_Serial_Baud" json:"baud,omitempty"`
 	Timeout                   uint32                                `protobuf:"varint,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	Mode                      uint32                                `protobuf:"varint,7,opt,name=mode,proto3" json:"mode,omitempty"`
 	OverrideConsoleSerialPort bool                                  `protobuf:"varint,8,opt,name=override_console_serial_port,json=overrideConsoleSerialPort,proto3" json:"overrideConsoleSerialPort,omitempty"`

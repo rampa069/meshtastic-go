@@ -1320,7 +1320,7 @@ func UnmarshalChannel(buf []byte) (*Channel, error) {
 			if vn == 0 {
 				return nil, ErrInvalidData
 			}
-			c.Role = Channel_Role(v)
+			c.Role = uint32(v)
 			offset += vn
 
 		default:
@@ -1601,7 +1601,7 @@ func UnmarshalDeviceConfig(buf []byte) (*Config_DeviceConfig, error) {
 			if vn == 0 {
 				break
 			}
-			dc.Role = Config_DeviceConfig_Role(v)
+			dc.Role = uint32(v)
 			offset += vn
 
 		case 2: // serial_enabled
@@ -1717,7 +1717,7 @@ func UnmarshalLoRaConfig(buf []byte) (*Config_LoRaConfig, error) {
 			if vn == 0 {
 				break
 			}
-			lc.ModemPreset = Config_LoRaConfig_ModemPreset(v)
+			lc.ModemPreset = uint32(v)
 			offset += vn
 
 		case 7: // region
@@ -1725,7 +1725,7 @@ func UnmarshalLoRaConfig(buf []byte) (*Config_LoRaConfig, error) {
 			if vn == 0 {
 				break
 			}
-			lc.Region = Config_LoRaConfig_RegionCode(v)
+			lc.Region = uint32(v)
 			offset += vn
 
 		case 8: // hop_limit
@@ -2053,7 +2053,7 @@ func UnmarshalBluetoothConfig(buf []byte) (*Config_BluetoothConfig, error) {
 			if vn == 0 {
 				break
 			}
-			bc.Mode = Config_BluetoothConfig_PairingMode(v)
+			bc.Mode = uint32(v)
 			offset += vn
 
 		case 3: // fixed_pin
@@ -3929,7 +3929,7 @@ func UnmarshalSerialConfig(buf []byte) (*ModuleConfig_SerialConfig, error) {
 			if vn == 0 {
 				break
 			}
-			sc.Baud = ModuleConfig_SerialConfig_Serial_Baud(v)
+			sc.Baud = uint32(v)
 			offset += vn
 
 		case 6: // timeout

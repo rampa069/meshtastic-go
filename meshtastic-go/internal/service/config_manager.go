@@ -284,7 +284,7 @@ func (cm *ConfigManager) ProcessChannel(channel *pb.Channel) {
 
 	ch := &Channel{
 		Index:       index,
-		Role:        channelRoleToString(channel.Role),
+		Role:        channelRoleToString(pb.Channel_Role(channel.Role)),
 		RawSettings: channel.Settings, // Store raw settings for URL generation
 	}
 
@@ -328,7 +328,7 @@ func (cm *ConfigManager) GetRawChannels() []*pb.Channel {
 			channels = append(channels, &pb.Channel{
 				Index:    uint32(ch.Index),
 				Settings: ch.RawSettings,
-				Role:     channelRoleFromString(ch.Role),
+				Role:     uint32(channelRoleFromString(ch.Role)),
 			})
 		}
 	}
@@ -360,7 +360,7 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 	// Process based on config type and store raw config
 	if device := config.GetDevice(); device != nil {
 		cm.deviceConfig = device
-		cm.config.Role = device.Role.String()
+		cm.config.Role = pb.Config_DeviceConfig_Role(device.Role).String()
 		cm.config.SerialEnabled = device.SerialEnabled
 		cm.config.DebugLogEnabled = device.DebugLogEnabled
 		cm.config.NodeInfoBroadcastSecs = int32(device.NodeInfoBroadcastSecs)
@@ -373,8 +373,8 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 
 	if lora := config.GetLora(); lora != nil {
 		cm.loraConfig = lora
-		cm.config.Region = lora.Region.String()
-		cm.config.ModemPreset = lora.ModemPreset.String()
+		cm.config.Region = pb.Config_LoRaConfig_RegionCode(lora.Region).String()
+		cm.config.ModemPreset = pb.Config_LoRaConfig_ModemPreset(lora.ModemPreset).String()
 		cm.config.HopLimit = int32(lora.HopLimit)
 		cm.config.TxEnabled = lora.TxEnabled
 		cm.config.TxPower = lora.TxPower
@@ -425,7 +425,7 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 	if bluetooth := config.GetBluetooth(); bluetooth != nil {
 		cm.bluetoothConfig = bluetooth
 		cm.config.BluetoothEnabled = bluetooth.Enabled
-		cm.config.BluetoothMode = bluetoothModeToString(bluetooth.Mode)
+		cm.config.BluetoothMode = bluetoothModeToString(pb.Config_BluetoothConfig_PairingMode(bluetooth.Mode))
 		cm.config.BluetoothFixedPin = int32(bluetooth.FixedPin)
 		configType = "bluetooth"
 		log.Debug().Bool("btEnabled", cm.config.BluetoothEnabled).Msg("processed bluetooth config")

@@ -514,7 +514,7 @@ func (s *Sender) SetChannel(channel *pb.Channel) (uint32, error) {
 
 	log.Info().
 		Uint32("index", channel.Index).
-		Str("role", channel.Role.String()).
+		Str("role", pb.Channel_Role(channel.Role).String()).
 		Msg("channel configuration set and committed")
 
 	return packetId, nil

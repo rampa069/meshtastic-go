@@ -171,7 +171,7 @@ func ChannelSetFromChannels(channels []*pb.Channel, loraConfig *pb.Config_LoRaCo
 	}
 
 	for _, ch := range channels {
-		if ch.Role != pb.Channel_DISABLED && ch.Settings != nil {
+		if ch.Role != uint32(pb.Channel_DISABLED) && ch.Settings != nil {
 			cs.Settings = append(cs.Settings, ch.Settings)
 		}
 	}
@@ -196,7 +196,7 @@ func ChannelsFromChannelSet(channelSet *pb.ChannelSet) []*pb.Channel {
 		channels = append(channels, &pb.Channel{
 			Index:    uint32(i),
 			Settings: settings,
-			Role:     role,
+			Role:     uint32(role),
 		})
 	}
 

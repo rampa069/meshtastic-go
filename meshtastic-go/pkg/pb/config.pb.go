@@ -150,7 +150,7 @@ const (
 
 // DeviceConfig contains device-specific settings.
 type Config_DeviceConfig struct {
-	Role                      Config_DeviceConfig_Role `protobuf:"varint,1,opt,name=role,proto3,enum=meshtastic.Config_DeviceConfig_Role" json:"role,omitempty"`
+	Role                      uint32 `protobuf:"varint,1,opt,name=role,proto3,enum=meshtastic.Config_DeviceConfig_Role" json:"role,omitempty"`
 	SerialEnabled             bool   `protobuf:"varint,2,opt,name=serial_enabled,json=serialEnabled,proto3" json:"serialEnabled,omitempty"`
 	DebugLogEnabled           bool   `protobuf:"varint,3,opt,name=debug_log_enabled,json=debugLogEnabled,proto3" json:"debugLogEnabled,omitempty"`
 	ButtonGpio                uint32 `protobuf:"varint,4,opt,name=button_gpio,json=buttonGpio,proto3" json:"buttonGpio,omitempty"`
@@ -249,12 +249,12 @@ func (c *Config_DisplayConfig) ProtoMessage() {}
 // LoRaConfig contains LoRa radio settings.
 type Config_LoRaConfig struct {
 	UsePreset           bool                         `protobuf:"varint,1,opt,name=use_preset,json=usePreset,proto3" json:"usePreset,omitempty"`
-	ModemPreset         Config_LoRaConfig_ModemPreset `protobuf:"varint,2,opt,name=modem_preset,json=modemPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"modemPreset,omitempty"`
+	ModemPreset         uint32 `protobuf:"varint,2,opt,name=modem_preset,json=modemPreset,proto3,enum=meshtastic.Config_LoRaConfig_ModemPreset" json:"modemPreset,omitempty"`
 	Bandwidth           uint32                       `protobuf:"varint,3,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
 	SpreadFactor        uint32                       `protobuf:"varint,4,opt,name=spread_factor,json=spreadFactor,proto3" json:"spreadFactor,omitempty"`
 	CodingRate          uint32                       `protobuf:"varint,5,opt,name=coding_rate,json=codingRate,proto3" json:"codingRate,omitempty"`
 	FrequencyOffset     float32                      `protobuf:"fixed32,6,opt,name=frequency_offset,json=frequencyOffset,proto3" json:"frequencyOffset,omitempty"`
-	Region              Config_LoRaConfig_RegionCode `protobuf:"varint,7,opt,name=region,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"region,omitempty"`
+	Region              uint32 `protobuf:"varint,7,opt,name=region,proto3,enum=meshtastic.Config_LoRaConfig_RegionCode" json:"region,omitempty"`
 	HopLimit            uint32                       `protobuf:"varint,8,opt,name=hop_limit,json=hopLimit,proto3" json:"hopLimit,omitempty"`
 	TxEnabled           bool                         `protobuf:"varint,9,opt,name=tx_enabled,json=txEnabled,proto3" json:"txEnabled,omitempty"`
 	TxPower             int32                        `protobuf:"varint,10,opt,name=tx_power,json=txPower,proto3" json:"txPower,omitempty"`
@@ -273,7 +273,7 @@ func (c *Config_LoRaConfig) ProtoMessage() {}
 // BluetoothConfig contains Bluetooth settings.
 type Config_BluetoothConfig struct {
 	Enabled     bool                               `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Mode        Config_BluetoothConfig_PairingMode `protobuf:"varint,2,opt,name=mode,proto3,enum=meshtastic.Config_BluetoothConfig_PairingMode" json:"mode,omitempty"`
+	Mode        uint32 `protobuf:"varint,2,opt,name=mode,proto3,enum=meshtastic.Config_BluetoothConfig_PairingMode" json:"mode,omitempty"`
 	FixedPin    uint32                             `protobuf:"varint,3,opt,name=fixed_pin,json=fixedPin,proto3" json:"fixedPin,omitempty"`
 }
 

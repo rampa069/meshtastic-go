@@ -52,7 +52,7 @@ func (m *ModuleSettings) ProtoMessage() {}
 type Channel struct {
 	Index    uint32           `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
 	Settings *ChannelSettings `protobuf:"bytes,2,opt,name=settings,proto3" json:"settings,omitempty"`
-	Role     Channel_Role     `protobuf:"varint,3,opt,name=role,proto3,enum=meshtastic.Channel_Role" json:"role,omitempty"`
+	Role     uint32           `protobuf:"varint,3,opt,name=role,proto3,enum=meshtastic.Channel_Role" json:"role,omitempty"`
 }
 
 func (c *Channel) Reset() { *c = Channel{} }
