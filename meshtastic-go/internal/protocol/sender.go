@@ -488,57 +488,79 @@ func (s *Sender) SetChannel(channel *pb.Channel) (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
-	if myNodeNum == 0 {
-		return 0, fmt.Errorf("not connected")
-	}
-
-	// Create the AdminMessage with SetChannel
-	adminMsg := &pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_SetChannel{
-			SetChannel: channel,
-		},
-	}
-
-	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	// Step 1: Begin edit settings
+	_, err := s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_BeginEditSettings{BeginEditSettings: true},
+	}, false)
 	if err != nil {
-		return 0, fmt.Errorf("failed to marshal admin message: %w", err)
+		return 0, fmt.Errorf("failed to begin edit settings: %w", err)
 	}
 
-	packetId := s.nextPacketId()
-
-	packet := &pb.MeshPacket{
-		From:     myNodeNum,
-		To:       myNodeNum, // Send to self for local config changes
-		Channel:  0,
-		Id:       packetId,
-		WantAck:  true,
-		HopLimit: 3,
-		HopStart: 3,
-		PayloadVariant: &pb.MeshPacket_Decoded{
-			Decoded: &pb.Data{
-				Portnum:      pb.PortNum_ADMIN_APP,
-				Payload:      adminData,
-				WantResponse: true,
-			},
-		},
-	}
-
-	toRadio := &pb.ToRadio{
-		PayloadVariant: &pb.ToRadio_Packet{
-			Packet: packet,
-		},
-	}
-
-	data, err := pb.MarshalToRadio(toRadio)
+	// Step 2: Send the channel config
+	packetId, err := s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_SetChannel{SetChannel: channel},
+	}, true)
 	if err != nil {
-		return 0, fmt.Errorf("failed to marshal ToRadio: %w", err)
+		return 0, fmt.Errorf("failed to set channel: %w", err)
+	}
+
+	// Step 3: Commit edit settings (persists to flash)
+	_, err = s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_CommitEditSettings{CommitEditSettings: true},
+	}, false)
+	if err != nil {
+		return 0, fmt.Errorf("failed to commit edit settings: %w", err)
 	}
 
 	log.Info().
 		Uint32("index", channel.Index).
 		Str("role", channel.Role.String()).
-		Msg("setting channel configuration")
+		Msg("channel configuration set and committed")
+
+	return packetId, nil
+}
+
+// sendAdminMessage sends an admin message to the local node (caller must hold s.mu)
+func (s *Sender) sendAdminMessage(adminMsg *pb.AdminMessage, wantResponse bool) (uint32, error) {
+	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
+	if myNodeNum == 0 {
+		return 0, fmt.Errorf("not connected")
+	}
+
+	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	if err != nil {
+		return 0, fmt.Errorf("failed to marshal admin message: %w", err)
+	}
+
+	packetId := s.nextPacketId()
+
+	packet := &pb.MeshPacket{
+		From:     myNodeNum,
+		To:       myNodeNum,
+		Channel:  0,
+		Id:       packetId,
+		WantAck:  true,
+		HopLimit: 3,
+		HopStart: 3,
+		PayloadVariant: &pb.MeshPacket_Decoded{
+			Decoded: &pb.Data{
+				Portnum:      pb.PortNum_ADMIN_APP,
+				Payload:      adminData,
+				WantResponse: wantResponse,
+			},
+		},
+	}
+
+	toRadio := &pb.ToRadio{
+		PayloadVariant: &pb.ToRadio_Packet{
+			Packet: packet,
+		},
+	}
+
+	data, err := pb.MarshalToRadio(toRadio)
+	if err != nil {
+		return 0, fmt.Errorf("failed to marshal ToRadio: %w", err)
+	}
 
 	if err := s.sendFramed(data); err != nil {
 		return 0, err
@@ -547,128 +569,74 @@ func (s *Sender) SetChannel(channel *pb.Channel) (uint32, error) {
 	return packetId, nil
 }
 
-// SetConfig sends a configuration to the local node
+// SetConfig sends a configuration to the local node with begin/commit edit sequence
 func (s *Sender) SetConfig(config *pb.Config) (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
-	if myNodeNum == 0 {
-		return 0, fmt.Errorf("not connected")
-	}
-
-	// Create the AdminMessage with SetConfig
-	adminMsg := &pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_SetConfig{
-			SetConfig: config,
-		},
-	}
-
-	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	// Step 1: Begin edit settings
+	_, err := s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_BeginEditSettings{BeginEditSettings: true},
+	}, false)
 	if err != nil {
-		return 0, fmt.Errorf("failed to marshal admin message: %w", err)
+		return 0, fmt.Errorf("failed to begin edit settings: %w", err)
 	}
 
-	packetId := s.nextPacketId()
-
-	packet := &pb.MeshPacket{
-		From:     myNodeNum,
-		To:       myNodeNum, // Send to self for local config changes
-		Channel:  0,
-		Id:       packetId,
-		WantAck:  true,
-		HopLimit: 3,
-		HopStart: 3,
-		PayloadVariant: &pb.MeshPacket_Decoded{
-			Decoded: &pb.Data{
-				Portnum:      pb.PortNum_ADMIN_APP,
-				Payload:      adminData,
-				WantResponse: true,
-			},
-		},
-	}
-
-	toRadio := &pb.ToRadio{
-		PayloadVariant: &pb.ToRadio_Packet{
-			Packet: packet,
-		},
-	}
-
-	data, err := pb.MarshalToRadio(toRadio)
+	// Step 2: Send the config
+	packetId, err := s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_SetConfig{SetConfig: config},
+	}, true)
 	if err != nil {
-		return 0, fmt.Errorf("failed to marshal ToRadio: %w", err)
+		return 0, fmt.Errorf("failed to set config: %w", err)
+	}
+
+	// Step 3: Commit edit settings (persists to flash)
+	_, err = s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_CommitEditSettings{CommitEditSettings: true},
+	}, false)
+	if err != nil {
+		return 0, fmt.Errorf("failed to commit edit settings: %w", err)
 	}
 
 	log.Info().
 		Uint32("packetId", packetId).
-		Msg("setting device configuration")
-
-	if err := s.sendFramed(data); err != nil {
-		return 0, err
-	}
+		Msg("device configuration set and committed")
 
 	return packetId, nil
 }
 
-// SetModuleConfig sends a module configuration to the local node
+// SetModuleConfig sends a module configuration to the local node with begin/commit edit sequence
 func (s *Sender) SetModuleConfig(moduleConfig *pb.ModuleConfig) (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	myNodeNum := atomic.LoadUint32(&s.myNodeNum)
-	if myNodeNum == 0 {
-		return 0, fmt.Errorf("not connected")
-	}
-
-	// Create the AdminMessage with SetModuleConfig
-	adminMsg := &pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_SetModuleConfig{
-			SetModuleConfig: moduleConfig,
-		},
-	}
-
-	adminData, err := pb.MarshalAdminMessage(adminMsg)
+	// Step 1: Begin edit settings
+	_, err := s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_BeginEditSettings{BeginEditSettings: true},
+	}, false)
 	if err != nil {
-		return 0, fmt.Errorf("failed to marshal admin message: %w", err)
+		return 0, fmt.Errorf("failed to begin edit settings: %w", err)
 	}
 
-	packetId := s.nextPacketId()
-
-	packet := &pb.MeshPacket{
-		From:     myNodeNum,
-		To:       myNodeNum, // Send to self for local config changes
-		Channel:  0,
-		Id:       packetId,
-		WantAck:  true,
-		HopLimit: 3,
-		HopStart: 3,
-		PayloadVariant: &pb.MeshPacket_Decoded{
-			Decoded: &pb.Data{
-				Portnum:      pb.PortNum_ADMIN_APP,
-				Payload:      adminData,
-				WantResponse: true,
-			},
-		},
-	}
-
-	toRadio := &pb.ToRadio{
-		PayloadVariant: &pb.ToRadio_Packet{
-			Packet: packet,
-		},
-	}
-
-	data, err := pb.MarshalToRadio(toRadio)
+	// Step 2: Send the module config
+	packetId, err := s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_SetModuleConfig{SetModuleConfig: moduleConfig},
+	}, true)
 	if err != nil {
-		return 0, fmt.Errorf("failed to marshal ToRadio: %w", err)
+		return 0, fmt.Errorf("failed to set module config: %w", err)
+	}
+
+	// Step 3: Commit edit settings (persists to flash)
+	_, err = s.sendAdminMessage(&pb.AdminMessage{
+		PayloadVariant: &pb.AdminMessage_CommitEditSettings{CommitEditSettings: true},
+	}, false)
+	if err != nil {
+		return 0, fmt.Errorf("failed to commit edit settings: %w", err)
 	}
 
 	log.Info().
 		Uint32("packetId", packetId).
-		Msg("setting module configuration")
-
-	if err := s.sendFramed(data); err != nil {
-		return 0, err
-	}
+		Msg("module configuration set and committed")
 
 	return packetId, nil
 }
