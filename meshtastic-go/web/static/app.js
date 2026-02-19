@@ -2991,6 +2991,8 @@ function getConfigValue(name) {
         return input.checked;
     } else if (input.type === 'number') {
         return parseInt(input.value, 10) || 0;
+    } else if (input.tagName === 'SELECT' && input.value !== '' && !isNaN(input.value)) {
+        return parseInt(input.value, 10);
     } else {
         return input.value;
     }
