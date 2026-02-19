@@ -2368,9 +2368,28 @@ function renderConfig() {
     }
 
     // Role options
-    const roleOptions = ['CLIENT', 'CLIENT_MUTE', 'ROUTER', 'ROUTER_CLIENT', 'REPEATER', 'TRACKER', 'SENSOR', 'TAK', 'CLIENT_HIDDEN', 'LOST_AND_FOUND', 'TAK_TRACKER'];
-    const regionOptions = ['UNSET', 'US', 'EU_433', 'EU_868', 'CN', 'JP', 'ANZ', 'KR', 'TW', 'RU', 'IN', 'NZ_865', 'TH', 'LORA_24', 'UA_433', 'UA_868', 'MY_433', 'MY_919', 'SG_923'];
-    const modemOptions = ['LONG_FAST', 'LONG_SLOW', 'LONG_MODERATE', 'VERY_LONG_SLOW', 'MEDIUM_SLOW', 'MEDIUM_FAST', 'SHORT_SLOW', 'SHORT_FAST', 'SHORT_TURBO'];
+    const roleOptions = [
+        {value: 0, label: 'Client'}, {value: 1, label: 'Client (Muted)'}, {value: 2, label: 'Router'},
+        {value: 3, label: 'Router + Client'}, {value: 4, label: 'Repeater'}, {value: 5, label: 'Tracker'},
+        {value: 6, label: 'Sensor'}, {value: 7, label: 'TAK'}, {value: 8, label: 'Client (Hidden)'},
+        {value: 9, label: 'Lost & Found'}, {value: 10, label: 'TAK Tracker'}
+    ];
+    const regionOptions = [
+        {value: 0, label: 'Not Set'}, {value: 1, label: 'United States'}, {value: 2, label: 'EU 433MHz'},
+        {value: 3, label: 'EU 868MHz'}, {value: 4, label: 'China'}, {value: 5, label: 'Japan'},
+        {value: 6, label: 'Australia/NZ'}, {value: 7, label: 'Korea'}, {value: 8, label: 'Taiwan'},
+        {value: 9, label: 'Russia'}, {value: 10, label: 'India'}, {value: 11, label: 'New Zealand 865MHz'},
+        {value: 12, label: 'Thailand'}, {value: 13, label: 'LoRa 2.4GHz'}, {value: 14, label: 'Ukraine 433MHz'},
+        {value: 15, label: 'Ukraine 868MHz'}, {value: 16, label: 'Malaysia 433MHz'}, {value: 17, label: 'Malaysia 919MHz'},
+        {value: 18, label: 'Singapore 923MHz'}
+    ];
+    const modemOptions = [
+        {value: 0, label: 'Long Range / Fast'}, {value: 1, label: 'Long Range / Slow'},
+        {value: 2, label: 'Very Long Range / Slow'}, {value: 3, label: 'Medium Range / Slow'},
+        {value: 4, label: 'Medium Range / Fast'}, {value: 5, label: 'Short Range / Slow'},
+        {value: 6, label: 'Short Range / Fast'}, {value: 7, label: 'Long Range / Moderate'},
+        {value: 8, label: 'Short Range / Turbo'}
+    ];
 
     configContent.innerHTML = `
         <!-- Device Info (Read-only) -->
@@ -2448,7 +2467,7 @@ function renderConfig() {
                 <div class="config-item editable">
                     <span class="config-item-label">Role</span>
                     <select class="config-item-select" data-config="device.role" onchange="markConfigChanged('device')">
-                        ${roleOptions.map(r => `<option value="${r}" ${deviceConfig.role === r ? 'selected' : ''}>${formatRole(r)}</option>`).join('')}
+                        ${roleOptions.map(r => `<option value="${r.value}" ${deviceConfig.role == r.value ? 'selected' : ''}>${r.label}</option>`).join('')}
                     </select>
                 </div>
                 <div class="config-item editable">
@@ -2498,13 +2517,13 @@ function renderConfig() {
                 <div class="config-item editable">
                     <span class="config-item-label">Region</span>
                     <select class="config-item-select" data-config="lora.region" onchange="markConfigChanged('lora')">
-                        ${regionOptions.map(r => `<option value="${r}" ${deviceConfig.region === r ? 'selected' : ''}>${formatRegion(r)}</option>`).join('')}
+                        ${regionOptions.map(r => `<option value="${r.value}" ${deviceConfig.region == r.value ? 'selected' : ''}>${r.label}</option>`).join('')}
                     </select>
                 </div>
                 <div class="config-item editable">
                     <span class="config-item-label">Modem Preset</span>
                     <select class="config-item-select" data-config="lora.modemPreset" onchange="markConfigChanged('lora')">
-                        ${modemOptions.map(m => `<option value="${m}" ${deviceConfig.modemPreset === m ? 'selected' : ''}>${formatModemPreset(m)}</option>`).join('')}
+                        ${modemOptions.map(m => `<option value="${m.value}" ${deviceConfig.modemPreset == m.value ? 'selected' : ''}>${m.label}</option>`).join('')}
                     </select>
                 </div>
                 <div class="config-item editable">
@@ -2723,9 +2742,9 @@ function renderConfig() {
                 <div class="config-item editable">
                     <span class="config-item-label">Pairing Mode</span>
                     <select class="config-item-select" data-config="bluetooth.mode" onchange="markConfigChanged('bluetooth')">
-                        <option value="RANDOM_PIN" ${deviceConfig.bluetoothMode === 'RANDOM_PIN' ? 'selected' : ''}>Random PIN</option>
-                        <option value="FIXED_PIN" ${deviceConfig.bluetoothMode === 'FIXED_PIN' ? 'selected' : ''}>Fixed PIN</option>
-                        <option value="NO_PIN" ${deviceConfig.bluetoothMode === 'NO_PIN' ? 'selected' : ''}>No PIN</option>
+                        <option value="0" ${deviceConfig.bluetoothMode == 0 ? 'selected' : ''}>Random PIN</option>
+                        <option value="1" ${deviceConfig.bluetoothMode == 1 ? 'selected' : ''}>Fixed PIN</option>
+                        <option value="2" ${deviceConfig.bluetoothMode == 2 ? 'selected' : ''}>No PIN</option>
                     </select>
                 </div>
                 <div class="config-item editable">
@@ -2842,66 +2861,6 @@ function formatHardwareModel(model) {
     if (!model) return '-';
     // Convert HELTEC_V3 to Heltec V3, TBEAM to T-Beam, etc.
     return model.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
-
-function formatRole(role) {
-    if (!role) return '-';
-    const roles = {
-        'CLIENT': 'Client',
-        'CLIENT_MUTE': 'Client (Muted)',
-        'ROUTER': 'Router',
-        'ROUTER_CLIENT': 'Router + Client',
-        'REPEATER': 'Repeater',
-        'TRACKER': 'Tracker',
-        'SENSOR': 'Sensor',
-        'TAK': 'TAK',
-        'CLIENT_HIDDEN': 'Client (Hidden)',
-        'LOST_AND_FOUND': 'Lost & Found',
-        'TAK_TRACKER': 'TAK Tracker'
-    };
-    return roles[role] || role;
-}
-
-function formatRegion(region) {
-    if (!region) return '-';
-    const regions = {
-        'UNSET': 'Not Set',
-        'US': 'United States',
-        'EU_433': 'EU 433MHz',
-        'EU_868': 'EU 868MHz',
-        'CN': 'China',
-        'JP': 'Japan',
-        'ANZ': 'Australia/NZ',
-        'KR': 'Korea',
-        'TW': 'Taiwan',
-        'RU': 'Russia',
-        'IN': 'India',
-        'NZ_865': 'New Zealand 865MHz',
-        'TH': 'Thailand',
-        'LORA_24': '2.4GHz',
-        'UA_433': 'Ukraine 433MHz',
-        'UA_868': 'Ukraine 868MHz',
-        'MY_433': 'Malaysia 433MHz',
-        'MY_919': 'Malaysia 919MHz',
-        'SG_923': 'Singapore 923MHz'
-    };
-    return regions[region] || region;
-}
-
-function formatModemPreset(preset) {
-    if (!preset) return '-';
-    const presets = {
-        'LONG_FAST': 'Long Range / Fast',
-        'LONG_SLOW': 'Long Range / Slow',
-        'LONG_MODERATE': 'Long Range / Moderate',
-        'VERY_LONG_SLOW': 'Very Long Range / Slow',
-        'MEDIUM_SLOW': 'Medium Range / Slow',
-        'MEDIUM_FAST': 'Medium Range / Fast',
-        'SHORT_SLOW': 'Short Range / Slow',
-        'SHORT_FAST': 'Short Range / Fast',
-        'SHORT_TURBO': 'Short Range / Turbo'
-    };
-    return presets[preset] || preset;
 }
 
 function formatInterval(seconds) {

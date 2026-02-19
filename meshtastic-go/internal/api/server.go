@@ -442,8 +442,8 @@ func (s *Server) handleExportChannelURL(c *gin.Context) {
 		Settings: make([]*pb.ChannelSettings, 0, len(rawChannels)),
 		LoraConfig: &pb.Config_LoRaConfig{
 			UsePreset:   true,
-			ModemPreset: uint32(modemPresetFromString(config.ModemPreset)),
-			Region:      uint32(regionFromString(config.Region)),
+			ModemPreset: uint32(config.ModemPreset),
+			Region:      uint32(config.Region),
 			HopLimit:    uint32(config.HopLimit),
 			TxEnabled:   config.TxEnabled,
 			TxPower:     config.TxPower,
@@ -475,74 +475,6 @@ func (s *Server) handleExportChannelURL(c *gin.Context) {
 		"url":     meshtasticURL,
 		"httpUrl": httpURL,
 	})
-}
-
-func modemPresetFromString(s string) pb.Config_LoRaConfig_ModemPreset {
-	switch s {
-	case "LONG_FAST":
-		return pb.Config_LoRaConfig_LONG_FAST
-	case "LONG_SLOW":
-		return pb.Config_LoRaConfig_LONG_SLOW
-	case "VERY_LONG_SLOW":
-		return pb.Config_LoRaConfig_VERY_LONG_SLOW
-	case "MEDIUM_SLOW":
-		return pb.Config_LoRaConfig_MEDIUM_SLOW
-	case "MEDIUM_FAST":
-		return pb.Config_LoRaConfig_MEDIUM_FAST
-	case "SHORT_SLOW":
-		return pb.Config_LoRaConfig_SHORT_SLOW
-	case "SHORT_FAST":
-		return pb.Config_LoRaConfig_SHORT_FAST
-	case "LONG_MODERATE":
-		return pb.Config_LoRaConfig_LONG_MODERATE
-	case "SHORT_TURBO":
-		return pb.Config_LoRaConfig_SHORT_TURBO
-	default:
-		return pb.Config_LoRaConfig_LONG_FAST
-	}
-}
-
-func regionFromString(s string) pb.Config_LoRaConfig_RegionCode {
-	switch s {
-	case "US":
-		return pb.Config_LoRaConfig_US
-	case "EU_433":
-		return pb.Config_LoRaConfig_EU_433
-	case "EU_868":
-		return pb.Config_LoRaConfig_EU_868
-	case "CN":
-		return pb.Config_LoRaConfig_CN
-	case "JP":
-		return pb.Config_LoRaConfig_JP
-	case "ANZ":
-		return pb.Config_LoRaConfig_ANZ
-	case "KR":
-		return pb.Config_LoRaConfig_KR
-	case "TW":
-		return pb.Config_LoRaConfig_TW
-	case "RU":
-		return pb.Config_LoRaConfig_RU
-	case "IN":
-		return pb.Config_LoRaConfig_IN
-	case "NZ_865":
-		return pb.Config_LoRaConfig_NZ_865
-	case "TH":
-		return pb.Config_LoRaConfig_TH
-	case "LORA_24":
-		return pb.Config_LoRaConfig_LORA_24
-	case "UA_433":
-		return pb.Config_LoRaConfig_UA_433
-	case "UA_868":
-		return pb.Config_LoRaConfig_UA_868
-	case "MY_433":
-		return pb.Config_LoRaConfig_MY_433
-	case "MY_919":
-		return pb.Config_LoRaConfig_MY_919
-	case "SG_923":
-		return pb.Config_LoRaConfig_SG_923
-	default:
-		return pb.Config_LoRaConfig_UNSET
-	}
 }
 
 // Config handlers

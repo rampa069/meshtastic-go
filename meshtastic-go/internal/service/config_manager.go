@@ -37,7 +37,7 @@ type DeviceConfig struct {
 	CanShutdown     bool   `json:"canShutdown"`
 
 	// Device config
-	Role                   string `json:"role"`
+	Role                   int32  `json:"role"`
 	SerialEnabled          bool   `json:"serialEnabled"`
 	DebugLogEnabled        bool   `json:"debugLogEnabled"`
 	NodeInfoBroadcastSecs  int32  `json:"nodeInfoBroadcastSecs"`
@@ -46,8 +46,8 @@ type DeviceConfig struct {
 	Tzdef                  string `json:"tzdef"`
 
 	// LoRa config
-	Region            string  `json:"region"`
-	ModemPreset       string  `json:"modemPreset"`
+	Region            int32   `json:"region"`
+	ModemPreset       int32   `json:"modemPreset"`
 	HopLimit          int32   `json:"hopLimit"`
 	TxEnabled         bool    `json:"txEnabled"`
 	TxPower           int32   `json:"txPower"`
@@ -81,8 +81,8 @@ type DeviceConfig struct {
 	WakeOnTapOrMotion      bool  `json:"wakeOnTapOrMotion"`
 
 	// Bluetooth config
-	BluetoothEnabled bool   `json:"bluetoothEnabled"`
-	BluetoothMode    string `json:"bluetoothMode"`
+	BluetoothEnabled  bool  `json:"bluetoothEnabled"`
+	BluetoothMode     int32 `json:"bluetoothMode"`
 	BluetoothFixedPin int32 `json:"bluetoothFixedPin"`
 
 	// Network config
@@ -360,7 +360,7 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 	// Process based on config type and store raw config
 	if device := config.GetDevice(); device != nil {
 		cm.deviceConfig = device
-		cm.config.Role = pb.Config_DeviceConfig_Role(device.Role).String()
+		cm.config.Role = int32(device.Role)
 		cm.config.SerialEnabled = device.SerialEnabled
 		cm.config.DebugLogEnabled = device.DebugLogEnabled
 		cm.config.NodeInfoBroadcastSecs = int32(device.NodeInfoBroadcastSecs)
@@ -368,13 +368,13 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 		cm.config.LedHeartbeatDisabled = device.LedHeartbeatDisabled
 		cm.config.Tzdef = device.Tzdef
 		configType = "device"
-		log.Debug().Str("role", cm.config.Role).Msg("processed device config")
+		log.Debug().Int32("role", cm.config.Role).Msg("processed device config")
 	}
 
 	if lora := config.GetLora(); lora != nil {
 		cm.loraConfig = lora
-		cm.config.Region = pb.Config_LoRaConfig_RegionCode(lora.Region).String()
-		cm.config.ModemPreset = pb.Config_LoRaConfig_ModemPreset(lora.ModemPreset).String()
+		cm.config.Region = int32(lora.Region)
+		cm.config.ModemPreset = int32(lora.ModemPreset)
 		cm.config.HopLimit = int32(lora.HopLimit)
 		cm.config.TxEnabled = lora.TxEnabled
 		cm.config.TxPower = lora.TxPower
@@ -382,7 +382,7 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 		cm.config.OverrideDutyCycle = lora.OverrideDutyCycle
 		cm.config.FrequencyOffset = lora.FrequencyOffset
 		configType = "lora"
-		log.Debug().Str("region", cm.config.Region).Str("modem", cm.config.ModemPreset).Msg("processed lora config")
+		log.Debug().Int32("region", cm.config.Region).Int32("modem", cm.config.ModemPreset).Msg("processed lora config")
 	}
 
 	if position := config.GetPosition(); position != nil {
@@ -425,7 +425,7 @@ func (cm *ConfigManager) ProcessConfig(config *pb.Config) {
 	if bluetooth := config.GetBluetooth(); bluetooth != nil {
 		cm.bluetoothConfig = bluetooth
 		cm.config.BluetoothEnabled = bluetooth.Enabled
-		cm.config.BluetoothMode = bluetoothModeToString(pb.Config_BluetoothConfig_PairingMode(bluetooth.Mode))
+		cm.config.BluetoothMode = int32(bluetooth.Mode)
 		cm.config.BluetoothFixedPin = int32(bluetooth.FixedPin)
 		configType = "bluetooth"
 		log.Debug().Bool("btEnabled", cm.config.BluetoothEnabled).Msg("processed bluetooth config")
@@ -585,13 +585,3 @@ func channelRoleToString(role pb.Channel_Role) string {
 	}
 }
 
-func bluetoothModeToString(mode pb.Config_BluetoothConfig_PairingMode) string {
-	switch mode {
-	case pb.Config_BluetoothConfig_RANDOM_PIN:
-		return "RANDOM_PIN"
-	case pb.Config_BluetoothConfig_FIXED_PIN:
-		return "FIXED_PIN"
-	default:
-		return "NO_PIN"
-	}
-}
