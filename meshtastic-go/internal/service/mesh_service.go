@@ -483,7 +483,13 @@ func (ms *MeshService) SetConfig(config *pb.Config) (uint32, error) {
 	if ms.sender == nil {
 		return 0, fmt.Errorf("not connected")
 	}
-	return ms.sender.SetConfig(config)
+	packetId, err := ms.sender.SetConfig(config)
+	if err != nil {
+		return 0, err
+	}
+	// Update local config state so GET reflects the new values immediately
+	ms.configManager.ProcessConfig(config)
+	return packetId, nil
 }
 
 // SetModuleConfig updates module configuration
@@ -491,7 +497,12 @@ func (ms *MeshService) SetModuleConfig(moduleConfig *pb.ModuleConfig) (uint32, e
 	if ms.sender == nil {
 		return 0, fmt.Errorf("not connected")
 	}
-	return ms.sender.SetModuleConfig(moduleConfig)
+	packetId, err := ms.sender.SetModuleConfig(moduleConfig)
+	if err != nil {
+		return 0, err
+	}
+	ms.configManager.ProcessModuleConfig(moduleConfig)
+	return packetId, nil
 }
 
 // Reboot sends a reboot command to the device
