@@ -488,15 +488,6 @@ func (s *Sender) SetChannel(channel *pb.Channel) (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Step 1: Begin edit settings
-	_, err := s.sendAdminMessage(&pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_BeginEditSettings{BeginEditSettings: true},
-	}, false)
-	if err != nil {
-		return 0, fmt.Errorf("failed to begin edit settings: %w", err)
-	}
-
-	// Step 2: Send the channel config
 	packetId, err := s.sendAdminMessage(&pb.AdminMessage{
 		PayloadVariant: &pb.AdminMessage_SetChannel{SetChannel: channel},
 	}, true)
@@ -504,18 +495,10 @@ func (s *Sender) SetChannel(channel *pb.Channel) (uint32, error) {
 		return 0, fmt.Errorf("failed to set channel: %w", err)
 	}
 
-	// Step 3: Commit edit settings (persists to flash)
-	_, err = s.sendAdminMessage(&pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_CommitEditSettings{CommitEditSettings: true},
-	}, false)
-	if err != nil {
-		return 0, fmt.Errorf("failed to commit edit settings: %w", err)
-	}
-
 	log.Info().
 		Uint32("index", channel.Index).
 		Str("role", pb.Channel_Role(channel.Role).String()).
-		Msg("channel configuration set and committed")
+		Msg("channel configuration sent")
 
 	return packetId, nil
 }
@@ -569,20 +552,12 @@ func (s *Sender) sendAdminMessage(adminMsg *pb.AdminMessage, wantResponse bool) 
 	return packetId, nil
 }
 
-// SetConfig sends a configuration to the local node with begin/commit edit sequence
+// SetConfig sends a configuration to the local node
+// The device firmware persists to flash and may reboot for certain config types
 func (s *Sender) SetConfig(config *pb.Config) (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Step 1: Begin edit settings
-	_, err := s.sendAdminMessage(&pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_BeginEditSettings{BeginEditSettings: true},
-	}, false)
-	if err != nil {
-		return 0, fmt.Errorf("failed to begin edit settings: %w", err)
-	}
-
-	// Step 2: Send the config
 	packetId, err := s.sendAdminMessage(&pb.AdminMessage{
 		PayloadVariant: &pb.AdminMessage_SetConfig{SetConfig: config},
 	}, true)
@@ -590,35 +565,18 @@ func (s *Sender) SetConfig(config *pb.Config) (uint32, error) {
 		return 0, fmt.Errorf("failed to set config: %w", err)
 	}
 
-	// Step 3: Commit edit settings (persists to flash)
-	_, err = s.sendAdminMessage(&pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_CommitEditSettings{CommitEditSettings: true},
-	}, false)
-	if err != nil {
-		return 0, fmt.Errorf("failed to commit edit settings: %w", err)
-	}
-
 	log.Info().
 		Uint32("packetId", packetId).
-		Msg("device configuration set and committed")
+		Msg("device configuration sent")
 
 	return packetId, nil
 }
 
-// SetModuleConfig sends a module configuration to the local node with begin/commit edit sequence
+// SetModuleConfig sends a module configuration to the local node
 func (s *Sender) SetModuleConfig(moduleConfig *pb.ModuleConfig) (uint32, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Step 1: Begin edit settings
-	_, err := s.sendAdminMessage(&pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_BeginEditSettings{BeginEditSettings: true},
-	}, false)
-	if err != nil {
-		return 0, fmt.Errorf("failed to begin edit settings: %w", err)
-	}
-
-	// Step 2: Send the module config
 	packetId, err := s.sendAdminMessage(&pb.AdminMessage{
 		PayloadVariant: &pb.AdminMessage_SetModuleConfig{SetModuleConfig: moduleConfig},
 	}, true)
@@ -626,17 +584,9 @@ func (s *Sender) SetModuleConfig(moduleConfig *pb.ModuleConfig) (uint32, error) 
 		return 0, fmt.Errorf("failed to set module config: %w", err)
 	}
 
-	// Step 3: Commit edit settings (persists to flash)
-	_, err = s.sendAdminMessage(&pb.AdminMessage{
-		PayloadVariant: &pb.AdminMessage_CommitEditSettings{CommitEditSettings: true},
-	}, false)
-	if err != nil {
-		return 0, fmt.Errorf("failed to commit edit settings: %w", err)
-	}
-
 	log.Info().
 		Uint32("packetId", packetId).
-		Msg("module configuration set and committed")
+		Msg("module configuration sent")
 
 	return packetId, nil
 }
